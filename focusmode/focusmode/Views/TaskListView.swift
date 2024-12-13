@@ -8,13 +8,13 @@ struct TaskListView: View {
         VStack {
             List {
                 ForEach(taskManager.tasks) { task in
-                    TaskRow(task: task, 
-                           onStart: {
-                               taskManager.startTask(task)
-                           },
-                           onDelete: {
-                               taskManager.deleteTask(task)
-                           })
+                    TaskRow(
+                        task: task,
+                        isCurrentTask: taskManager.currentTask?.id == task.id,
+                        onDelete: {
+                            taskManager.deleteTask(task)
+                        }
+                    )
                     .contextMenu {
                         Button(role: .destructive) {
                             taskManager.deleteTask(task)
@@ -46,7 +46,7 @@ struct TaskListView: View {
 
 struct TaskRow: View {
     let task: Task
-    let onStart: () -> Void
+    let isCurrentTask: Bool
     let onDelete: () -> Void
     
     var body: some View {
@@ -61,27 +61,21 @@ struct TaskRow: View {
             
             Spacer()
             
-            HStack(spacing: 12) {
-                if task.status == .notStarted {
-                    Button("Start Working") {
-                        onStart()
-                    }
-                } else {
-                    Text(task.status.rawValue)
-                        .foregroundColor(.secondary)
-                }
-                
-                Button(action: {
-                    onDelete()
-                }) {
-                    Image(systemName: "trash")
-                        .foregroundColor(.red)
-                }
-                .buttonStyle(PlainButtonStyle())
-                .help("Delete Task")
+            if isCurrentTask {
+                Text("Current Task")
+                    .foregroundColor(.secondary)
+                    .font(.caption)
             }
+            
+            Button(action: onDelete) {
+                Image(systemName: "trash")
+                    .foregroundColor(.red)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .help("Delete Task")
         }
         .padding(.vertical, 8)
+        .opacity(isCurrentTask ? 1.0 : 0.6)
     }
     
     private func formatDuration(_ duration: TimeInterval) -> String {

@@ -46,10 +46,10 @@ struct ProgressStylePicker: View {
 }
 
 struct FloatingTimerView: View {
+    @StateObject private var taskManager = TaskManager.shared
     let task: Task
     @Binding var progressStyle: ProgressStyle
     @State private var isHovering = false
-    @State private var isRunning = false
     @State private var remainingSeconds: Int
     @State private var waveOffset = 0.0
     
@@ -62,7 +62,6 @@ struct FloatingTimerView: View {
         self._progressStyle = progressStyle
         let seconds = Int(task.duration)
         _remainingSeconds = State(initialValue: seconds)
-        _isRunning = State(initialValue: true)
         self.initialSeconds = seconds
     }
     
@@ -155,9 +154,9 @@ struct FloatingTimerView: View {
                 // Only show button when hovering
                 if isHovering {
                     Button(action: {
-                        isRunning.toggle()
+                        taskManager.toggleWorkingState()
                     }) {
-                        Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                        Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
                             .foregroundColor(.primary)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -189,13 +188,13 @@ struct FloatingTimerView: View {
     
     private func startTimer() {
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            guard isRunning else { return }
+            guard taskManager.isWorking else { return }
             
             if remainingSeconds > 0 {
                 remainingSeconds -= 1
             } else {
                 timer.invalidate()
-                // Here you could add logic for when timer completes
+                taskManager.completeCurrentTask()
             }
         }
     }
