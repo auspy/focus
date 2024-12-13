@@ -117,23 +117,39 @@ struct FloatingTimerView: View {
             HStack(spacing: 12) {
                 Text(timerDisplay)
                     .monospacedDigit()
-                    // .frame(width: 80)
                 
-                // Only show button when hovering
+                // Only show buttons when hovering
                 if isHovering {
-                    Button(action: {
-                        taskManager.toggleWorkingState()
-                    }) {
-                        Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
-                            .foregroundColor(.primary)
-                            // .frame(width: 20)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .onHover { isHovered in
-                        if isHovered {
-                            NSCursor.pointingHand.push()
-                        } else {
-                            NSCursor.pop()
+                    HStack(spacing: 8) { // Added spacing between buttons
+                        Button(action: {
+                            taskManager.toggleWorkingState()
+                        }) {
+                            Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
+                                .foregroundColor(.primary)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .onHover { isHovered in
+                            if isHovered {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
+                            }
+                        }
+                        
+                        // New tick button
+                        Button(action: {
+                            taskManager.completeCurrentTask()
+                        }) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .onHover { isHovered in
+                            if isHovered {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
+                            }
                         }
                     }
                 }
@@ -198,6 +214,16 @@ struct FloatingTimerView: View {
             
             // Update timer with new task's remaining duration
             remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
+        }
+        
+        // Listen for all tasks completed
+        NotificationCenter.default.addObserver(
+            forName: .allTasksCompleted,
+            object: nil,
+            queue: .main
+        ) { _ in
+            // Reset the timer
+            remainingSeconds = 0
         }
     }
 }

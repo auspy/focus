@@ -33,21 +33,37 @@ class TaskManager: ObservableObject {
     }
     
     func completeCurrentTask() {
-        guard let task = currentTask else { return }
+        guard var currentTask = currentTask else { return }
         
-        // Update task status
-        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-            tasks[index].status = .completed
-            tasks[index].completedAt = Date()
+        // Update completion time
+        currentTask.completedAt = Date()
+        
+        // Remove from active tasks list
+        if let index = tasks.firstIndex(where: { $0.id == currentTask.id }) {
+            tasks.remove(at: index)
         }
         
-        currentTask = nil
+        // Stop working state first
+        isWorking = false
         
-        // Notify completion
-        NotificationCenter.default.post(name: .taskCompleted, object: nil)
+        // Move to next task if available
+        if !tasks.isEmpty {
+            self.currentTask = tasks[0]
+            NotificationCenter.default.post(
+                name: .taskSwitched,
+                object: nil,
+                userInfo: ["newTask": tasks[0]]
+            )
+        } else {
+            self.currentTask = nil
+            // Notify that all tasks are completed
+            NotificationCenter.default.post(name: .allTasksCompleted, object: nil)
+            // Close floating window when no tasks left
+            WindowManager.shared.closeFloatingWindow()
+        }
         
-        // Save changes
-        saveChanges()
+        // Notify observers about task completion
+        objectWillChange.send()
     }
     
     func addTask(title: String, duration: TimeInterval) {
@@ -127,4 +143,5 @@ extension Notification.Name {
     static let taskStarted = Notification.Name("taskStarted")
     static let taskPaused = Notification.Name("taskPaused")
     static let taskSwitched = Notification.Name("taskSwitched")
+    static let allTasksCompleted = Notification.Name("allTasksCompleted")
 } 
