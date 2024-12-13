@@ -12,12 +12,9 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            // Main start button at the top
             startButton
-            
-            // Task list below
             TaskListView()
-                .opacity(taskManager.isWorking ? 0.6 : 1.0) // Dim when working
+                .opacity(taskManager.isWorking ? 0.6 : 1.0)
         }
         .padding()
     }
@@ -30,18 +27,29 @@ struct ContentView: View {
                 taskManager.toggleWorkingState()
             }
         }) {
-            HStack {
-                Image(systemName: taskManager.isWorking ? "pause.circle.fill" : "play.circle.fill")
-                    .font(.system(size: 24))
-                Text(taskManager.isWorking ? "Working..." : "Start Working")
-                    .font(.headline)
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    if taskManager.isWorking {
+                        WaveProgressView(
+                            progress: calculateTaskProgress(taskManager.currentTask),
+                            color: Color.accentColor
+                        )
+                    }
+                    
+                    HStack {
+                        Image(systemName: taskManager.isWorking ? "pause.circle.fill" : "play.circle.fill")
+                            .font(.system(size: 24))
+                        Text(taskManager.isWorking ? "Working..." : "Start Working")
+                            .font(.headline)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(.white)
+                }
             }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(taskManager.isWorking ? Color.gray.opacity(0.3) : Color.accentColor)
-            .foregroundColor(taskManager.isWorking ? .secondary : .white)
-            .cornerRadius(10)
         }
+        .frame(height: 44)
+        .background(taskManager.isWorking ? Color.gray.opacity(0.3) : Color.accentColor)
+        .cornerRadius(10)
         .buttonStyle(PlainButtonStyle())
         .disabled(taskManager.tasks.isEmpty)
     }

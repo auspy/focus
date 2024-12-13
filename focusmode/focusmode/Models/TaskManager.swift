@@ -65,6 +65,50 @@ class TaskManager: ObservableObject {
         saveChanges()
     }
     
+    func updateTaskRemainingDuration(_ duration: TimeInterval) {
+        guard let currentTaskId = currentTask?.id,
+              let index = tasks.firstIndex(where: { $0.id == currentTaskId }) else { return }
+        
+        tasks[index].remainingDuration = duration
+        currentTask = tasks[index]
+    }
+    
+    func moveTask(from source: IndexSet, to destination: Int) {
+        // Store the current top task before moving
+        let oldTopTaskId = tasks.first?.id
+        
+        // Perform the move
+        tasks.move(fromOffsets: source, toOffset: destination)
+        
+        // Check if top task changed and we're currently working
+        if isWorking,
+           let newTopTask = tasks.first,
+           oldTopTaskId != newTopTask.id,
+           let currentTask = currentTask {
+            
+            // Store progress of current task before switching
+            updateTaskRemainingDuration(TimeInterval(currentTask.remainingDuration ?? currentTask.duration))
+            
+            // Pause current task
+            isWorking = false
+            
+            // Switch to new top task
+            self.currentTask = newTopTask
+            
+            // Notify about task switch
+            NotificationCenter.default.post(
+                name: .taskSwitched,
+                object: nil,
+                userInfo: [
+                    "oldTask": currentTask,
+                    "newTask": newTopTask
+                ]
+            )
+        }
+        
+        saveChanges()
+    }
+    
     // MARK: - Persistence
     private func loadTasks() {
         // TODO: Replace with actual persistence implementation
@@ -82,4 +126,5 @@ class TaskManager: ObservableObject {
 extension Notification.Name {
     static let taskStarted = Notification.Name("taskStarted")
     static let taskPaused = Notification.Name("taskPaused")
+    static let taskSwitched = Notification.Name("taskSwitched")
 } 

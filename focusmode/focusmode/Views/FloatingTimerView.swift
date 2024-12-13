@@ -47,7 +47,6 @@ struct ProgressStylePicker: View {
 
 struct FloatingTimerView: View {
     @StateObject private var taskManager = TaskManager.shared
-    let task: Task
     @Binding var progressStyle: ProgressStyle
     @State private var isHovering = false
     @State private var remainingSeconds: Int
@@ -57,12 +56,16 @@ struct FloatingTimerView: View {
     private let progressColor = Color(hex: "#007AFF") // Apple's default blue
     private let initialSeconds: Int
     
+    // Computed property to get current task
+    private var currentTask: Task? {
+        taskManager.currentTask
+    }
+    
     init(task: Task, progressStyle: Binding<ProgressStyle>) {
-        self.task = task
         self._progressStyle = progressStyle
-        let seconds = Int(task.duration)
+        let seconds = Int(task.remainingDuration ?? task.duration)
         _remainingSeconds = State(initialValue: seconds)
-        self.initialSeconds = seconds
+        self.initialSeconds = Int(task.duration)
     }
     
     private var timerDisplay: String {
@@ -82,51 +85,14 @@ struct FloatingTimerView: View {
         return CGFloat(elapsed) / CGFloat(initialSeconds)
     }
     
-    // Wave shape for animated fill
-    private struct WaveShape: Shape {
-        var progress: CGFloat
-        var waveHeight: CGFloat
-        var offset: CGFloat
-        
-        var animatableData: CGFloat {
-            get { offset }
-            set { offset = newValue }
-        }
-        
-        func path(in rect: CGRect) -> Path {
-            var path = Path()
-            let width = rect.width
-            let height = rect.height
-            let progressWidth = width * progress
-            
-            path.move(to: .zero)
-            
-            // Draw wave
-            for x in stride(from: 0, through: progressWidth, by: 2) {
-                let relativeX = x / 20 // Adjust wave frequency
-                let y = sin(relativeX + offset) * waveHeight
-                path.addLine(to: CGPoint(x: x, y: height/2 + y))
-            }
-            
-            // Complete the shape
-            path.addLine(to: CGPoint(x: progressWidth, y: height))
-            path.addLine(to: CGPoint(x: 0, y: height))
-            path.closeSubpath()
-            
-            return path
-        }
-    }
-    
     @ViewBuilder
     private func progressView(in geometry: GeometryProxy) -> some View {
         switch progressStyle {
         case .wave:
-            WaveShape(
-                progress: progress,
-                waveHeight: 4,
-                offset: waveOffset
+            WaveProgressView(
+                progress: calculateTaskProgress(taskManager.currentTask),
+                color: progressColor
             )
-            .fill(progressColor)
             .animation(.linear(duration: 2), value: progress)
             
         case .linear:
@@ -137,19 +103,21 @@ struct FloatingTimerView: View {
     }
     
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             // Text on left
-            Text(task.title)
+            Text(currentTask?.title ?? "No Task")
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .padding(.leading)
+                .frame(minWidth: 100)
             
             Spacer()
             
             // Timer and control button on right
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 Text(timerDisplay)
                     .monospacedDigit()
+                    .frame(width: 80)
                 
                 // Only show button when hovering
                 if isHovering {
@@ -158,6 +126,7 @@ struct FloatingTimerView: View {
                     }) {
                         Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
                             .foregroundColor(.primary)
+                            .frame(width: 20)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
@@ -183,6 +152,17 @@ struct FloatingTimerView: View {
                     waveOffset = .pi * 2
                 }
             }
+            
+            // Update initial state if needed
+            if let task = currentTask {
+                remainingSeconds = Int(task.remainingDuration ?? task.duration)
+            }
+        }
+        .onChange(of: currentTask?.id) { _ in
+            // Update when current task changes
+            if let task = currentTask {
+                remainingSeconds = Int(task.remainingDuration ?? task.duration)
+            }
         }
     }
     
@@ -192,10 +172,25 @@ struct FloatingTimerView: View {
             
             if remainingSeconds > 0 {
                 remainingSeconds -= 1
+                // Update task remaining duration through TaskManager
+                taskManager.updateTaskRemainingDuration(TimeInterval(remainingSeconds))
             } else {
                 timer.invalidate()
                 taskManager.completeCurrentTask()
             }
+        }
+        
+        // Listen for task switches
+        NotificationCenter.default.addObserver(
+            forName: .taskSwitched,
+            object: nil,
+            queue: .main
+        ) { [self] notification in
+            guard let userInfo = notification.userInfo,
+                  let newTask = userInfo["newTask"] as? Task else { return }
+            
+            // Update timer with new task's remaining duration
+            remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
         }
     }
 }
