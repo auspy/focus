@@ -109,7 +109,7 @@ struct FloatingTimerView: View {
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .padding(.leading)
-                .frame(minWidth: 100)
+                // .frame(minWidth: 100)
             
             Spacer()
             
@@ -117,7 +117,7 @@ struct FloatingTimerView: View {
             HStack(spacing: 12) {
                 Text(timerDisplay)
                     .monospacedDigit()
-                    .frame(width: 80)
+                    // .frame(width: 80)
                 
                 // Only show button when hovering
                 if isHovering {
@@ -126,7 +126,7 @@ struct FloatingTimerView: View {
                     }) {
                         Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
                             .foregroundColor(.primary)
-                            .frame(width: 20)
+                            // .frame(width: 20)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
