@@ -58,8 +58,6 @@ class TaskManager: ObservableObject {
             self.currentTask = nil
             // Notify that all tasks are completed
             NotificationCenter.default.post(name: .allTasksCompleted, object: nil)
-            // Close floating window when no tasks left
-            WindowManager.shared.closeFloatingWindow()
         }
         
         // Notify observers about task completion
@@ -76,7 +74,6 @@ class TaskManager: ObservableObject {
         tasks.removeAll { $0.id == task.id }
         if currentTask?.id == task.id {
             currentTask = nil
-            WindowManager.shared.closeFloatingWindow()
         }
         saveChanges()
     }

@@ -51,6 +51,7 @@ struct FloatingTimerView: View {
     @State private var isHovering = false
     @State private var remainingSeconds: Int
     @State private var waveOffset = 0.0
+    @State private var showCelebration = false
     
     // Constants for customization
     private let progressColor = Color(hex: "#007AFF") // Apple's default blue
@@ -59,6 +60,11 @@ struct FloatingTimerView: View {
     // Computed property to get current task
     private var currentTask: Task? {
         taskManager.currentTask
+    }
+    
+    // Add computed property to check tasks status
+    private var isAllTasksComplete: Bool {
+        taskManager.tasks.isEmpty && currentTask == nil
     }
     
     init(task: Task, progressStyle: Binding<ProgressStyle>) {
@@ -103,67 +109,67 @@ struct FloatingTimerView: View {
     }
     
     var body: some View {
-        HStack(spacing: 0) {
-            // Text on left
-            Text(currentTask?.title ?? "No Task")
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .padding(.leading)
-                // .frame(minWidth: 100)
-            
-            Spacer()
-            
-            // Timer and control button on right
-            HStack(spacing: 12) {
-                Text(timerDisplay)
-                    .monospacedDigit()
-                
-                // Only show buttons when hovering
-                if isHovering {
-                    HStack(spacing: 8) { // Added spacing between buttons
-                        Button(action: {
-                            taskManager.toggleWorkingState()
-                        }) {
-                            Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
-                                .foregroundColor(.primary)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .onHover { isHovered in
-                            if isHovered {
-                                NSCursor.pointingHand.push()
-                            } else {
-                                NSCursor.pop()
-                            }
-                        }
+        ZStack {
+            if showCelebration {
+                CelebrationView(
+                    isAllTasksComplete: isAllTasksComplete,
+                    taskTitle: currentTask?.title ?? ""
+                )
+            } else {
+                HStack(spacing: 0) {
+                    // Text on left
+                    Text(currentTask?.title ?? "No Task")
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .padding(.leading)
+                        // .frame(minWidth: 100)
+                    
+                    Spacer()
+                    
+                    // Timer and control button on right
+                    HStack(spacing: 12) {
+                        Text(timerDisplay)
+                            .monospacedDigit()
                         
-                        // New tick button
-                        Button(action: {
-                            taskManager.completeCurrentTask()
-                        }) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .onHover { isHovered in
-                            if isHovered {
-                                NSCursor.pointingHand.push()
-                            } else {
-                                NSCursor.pop()
+                        // Only show buttons when hovering
+                        if isHovering {
+                            HStack(spacing: 8) { // Added spacing between buttons
+                                Button(action: {
+                                    taskManager.toggleWorkingState()
+                                }) {
+                                    Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
+                                        .foregroundColor(.primary)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .onHover { isHovered in
+                                    if isHovered {
+                                        NSCursor.pointingHand.push()
+                                    } else {
+                                        NSCursor.pop()
+                                    }
+                                }
+                                
+                                // New tick button
+                                Button(action: completeTask) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .onHover { isHovered in
+                                    if isHovered {
+                                        NSCursor.pointingHand.push()
+                                    } else {
+                                        NSCursor.pop()
+                                    }
+                                }
                             }
                         }
                     }
+                    .padding(.trailing)
                 }
             }
-            .padding(.trailing)
         }
         .frame(height: 40)
-        .background(
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    progressView(in: geometry)
-                }
-            }
-        )
         .background(Color(NSColor.windowBackgroundColor))
         .onHover { hovering in
             isHovering = hovering
@@ -179,12 +185,22 @@ struct FloatingTimerView: View {
             // Update initial state if needed
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
+                // Reset celebration state when a task is present
+                showCelebration = false
             }
         }
         .onChange(of: currentTask?.id) { _ in
             // Update when current task changes
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
+                // Reset celebration state when switching to a new task
+                showCelebration = false
+            }
+        }
+        .onChange(of: taskManager.tasks) { tasks in
+            // If tasks were added (list is not empty), reset celebration
+            if !tasks.isEmpty {
+                showCelebration = false
             }
         }
     }
@@ -214,6 +230,8 @@ struct FloatingTimerView: View {
             
             // Update timer with new task's remaining duration
             remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
+            // Only reset celebration, isAllTasksComplete is now computed
+            showCelebration = false
         }
         
         // Listen for all tasks completed
@@ -221,9 +239,22 @@ struct FloatingTimerView: View {
             forName: .allTasksCompleted,
             object: nil,
             queue: .main
-        ) { _ in
-            // Reset the timer
+        ) { [self] _ in
             remainingSeconds = 0
+            showCelebration = true
+        }
+    }
+    
+    private func completeTask() {
+        guard let currentTask = taskManager.currentTask else { return }
+        
+        // Show celebration
+        showCelebration = true
+        
+        // After brief celebration, complete the task and move to next
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            showCelebration = false
+            taskManager.completeCurrentTask()
         }
     }
 }

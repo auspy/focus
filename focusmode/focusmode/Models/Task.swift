@@ -1,6 +1,6 @@
 import Foundation
 
-struct Task: Identifiable {
+struct Task: Identifiable, Equatable {
     let id: UUID
     var title: String
     var duration: TimeInterval
@@ -14,9 +14,18 @@ struct Task: Identifiable {
         self.duration = duration
         self.status = .notStarted
     }
+    
+    static func == (lhs: Task, rhs: Task) -> Bool {
+        lhs.id == rhs.id &&
+        lhs.title == rhs.title &&
+        lhs.duration == rhs.duration &&
+        lhs.remainingDuration == rhs.remainingDuration &&
+        lhs.status == rhs.status &&
+        lhs.completedAt == rhs.completedAt
+    }
 }
 
-enum TaskStatus: String {
+enum TaskStatus: String, Equatable {
     case notStarted
     case inProgress
     case completed
