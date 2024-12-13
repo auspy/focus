@@ -8,6 +8,7 @@ class WindowManager: NSObject, ObservableObject {
     private var workspaceObserver: NSObjectProtocol?
     private var currentScreen: NSScreen?
     @Published var selectedProgressStyle: ProgressStyle = .wave
+    @Published private(set) var isManuallyClosed = false
     
     override init() {
         super.init()
@@ -32,7 +33,8 @@ class WindowManager: NSObject, ObservableObject {
     }
     
     private func handleSpaceChange() {
-        guard let window = floatingWindow,
+        guard !isManuallyClosed,
+              let window = floatingWindow,
               let windowScreen = window.screen,
               let activeScreen = NSScreen.main else { return }
         
@@ -42,6 +44,8 @@ class WindowManager: NSObject, ObservableObject {
     }
     
     func showFloatingTimer(for task: Task) {
+        isManuallyClosed = false
+        
         if let existingWindow = floatingWindow {
             existingWindow.makeKeyAndOrderFront(nil)
             return
@@ -106,10 +110,17 @@ class WindowManager: NSObject, ObservableObject {
         currentScreen = window.screen
     }
     
-    func closeFloatingWindow() {
+    func closeFloatingWindow(manually: Bool = false) {
         if let window = floatingWindow {
             saveWindowPosition(window.frame.origin)
         }
+        
+        isManuallyClosed = manually
+        
+        if manually {
+            TaskManager.shared.toggleWorkingState()
+        }
+        
         floatingWindow?.close()
         floatingWindow = nil
     }
@@ -151,5 +162,10 @@ extension WindowManager: NSWindowDelegate {
     func windowDidChangeScreenProfile(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
         window.invalidateShadow()
+    }
+    
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        closeFloatingWindow(manually: true)
+        return true
     }
 } 
