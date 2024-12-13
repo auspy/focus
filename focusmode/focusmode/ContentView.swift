@@ -27,31 +27,37 @@ struct ContentView: View {
                 taskManager.toggleWorkingState()
             }
         }) {
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    if taskManager.isWorking {
-                        WaveProgressView(
-                            progress: calculateTaskProgress(taskManager.currentTask),
-                            color: Color.accentColor
-                        )
-                    }
-                    
-                    HStack {
-                        Image(systemName: taskManager.isWorking ? "pause.circle.fill" : "play.circle.fill")
-                            .font(.system(size: 24))
-                        Text(taskManager.isWorking ? "Working..." : "Start Working")
-                            .font(.headline)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(.white)
+            ZStack {
+                if taskManager.isWorking {
+                    WaveProgressView(
+                        progress: calculateTaskProgress(taskManager.currentTask),
+                        color: Color.accentColor
+                    )
                 }
+                
+                HStack(spacing: 8) {
+                    Image(systemName: taskManager.isWorking ? "pause.circle.fill" : "play.circle.fill")
+                        .font(.system(size: 24))
+                    Text(taskManager.isWorking ? "Working..." : "Start Working")
+                        .font(.headline)
+                }
+                .foregroundColor(.white)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
         }
         .frame(height: 44)
         .background(taskManager.isWorking ? Color.gray.opacity(0.3) : Color.accentColor)
         .cornerRadius(10)
         .buttonStyle(PlainButtonStyle())
         .disabled(taskManager.tasks.isEmpty)
+        .onHover { isHovered in
+            if isHovered {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
+            }
+        }
     }
     
     private func startWorkSession() {

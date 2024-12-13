@@ -129,6 +129,13 @@ struct FloatingTimerView: View {
                             // .frame(width: 20)
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .onHover { isHovered in
+                        if isHovered {
+                            NSCursor.pointingHand.push()
+                        } else {
+                            NSCursor.pop()
+                        }
+                    }
                 }
             }
             .padding(.trailing)
