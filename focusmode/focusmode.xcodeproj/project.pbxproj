@@ -1,0 +1,554 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		DBCFCFC32D0C53B00059804A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DBCFCFA42D0C53AD0059804A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DBCFCFAB2D0C53AD0059804A;
+			remoteInfo = focusmode;
+		};
+		DBCFCFCD2D0C53B00059804A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DBCFCFA42D0C53AD0059804A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DBCFCFAB2D0C53AD0059804A;
+			remoteInfo = focusmode;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		DBCFCFAC2D0C53AD0059804A /* focusmode.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = focusmode.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBCFCFC22D0C53B00059804A /* focusmodeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = focusmodeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBCFCFCC2D0C53B00059804A /* focusmodeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = focusmodeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		DBCFCFAE2D0C53AD0059804A /* focusmode */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = focusmode;
+			sourceTree = "<group>";
+		};
+		DBCFCFC52D0C53B00059804A /* focusmodeTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = focusmodeTests;
+			sourceTree = "<group>";
+		};
+		DBCFCFCF2D0C53B00059804A /* focusmodeUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = focusmodeUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DBCFCFA92D0C53AD0059804A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBCFCFBF2D0C53B00059804A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBCFCFC92D0C53B00059804A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DBCFCFA32D0C53AD0059804A = {
+			isa = PBXGroup;
+			children = (
+				DBCFCFAE2D0C53AD0059804A /* focusmode */,
+				DBCFCFC52D0C53B00059804A /* focusmodeTests */,
+				DBCFCFCF2D0C53B00059804A /* focusmodeUITests */,
+				DBCFCFAD2D0C53AD0059804A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DBCFCFAD2D0C53AD0059804A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DBCFCFAC2D0C53AD0059804A /* focusmode.app */,
+				DBCFCFC22D0C53B00059804A /* focusmodeTests.xctest */,
+				DBCFCFCC2D0C53B00059804A /* focusmodeUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DBCFCFAB2D0C53AD0059804A /* focusmode */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DBCFCFD62D0C53B00059804A /* Build configuration list for PBXNativeTarget "focusmode" */;
+			buildPhases = (
+				DBCFCFA82D0C53AD0059804A /* Sources */,
+				DBCFCFA92D0C53AD0059804A /* Frameworks */,
+				DBCFCFAA2D0C53AD0059804A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DBCFCFAE2D0C53AD0059804A /* focusmode */,
+			);
+			name = focusmode;
+			packageProductDependencies = (
+			);
+			productName = focusmode;
+			productReference = DBCFCFAC2D0C53AD0059804A /* focusmode.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DBCFCFC12D0C53B00059804A /* focusmodeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DBCFCFD92D0C53B00059804A /* Build configuration list for PBXNativeTarget "focusmodeTests" */;
+			buildPhases = (
+				DBCFCFBE2D0C53B00059804A /* Sources */,
+				DBCFCFBF2D0C53B00059804A /* Frameworks */,
+				DBCFCFC02D0C53B00059804A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DBCFCFC42D0C53B00059804A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DBCFCFC52D0C53B00059804A /* focusmodeTests */,
+			);
+			name = focusmodeTests;
+			packageProductDependencies = (
+			);
+			productName = focusmodeTests;
+			productReference = DBCFCFC22D0C53B00059804A /* focusmodeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DBCFCFCB2D0C53B00059804A /* focusmodeUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DBCFCFDC2D0C53B00059804A /* Build configuration list for PBXNativeTarget "focusmodeUITests" */;
+			buildPhases = (
+				DBCFCFC82D0C53B00059804A /* Sources */,
+				DBCFCFC92D0C53B00059804A /* Frameworks */,
+				DBCFCFCA2D0C53B00059804A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DBCFCFCE2D0C53B00059804A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DBCFCFCF2D0C53B00059804A /* focusmodeUITests */,
+			);
+			name = focusmodeUITests;
+			packageProductDependencies = (
+			);
+			productName = focusmodeUITests;
+			productReference = DBCFCFCC2D0C53B00059804A /* focusmodeUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DBCFCFA42D0C53AD0059804A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					DBCFCFAB2D0C53AD0059804A = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					DBCFCFC12D0C53B00059804A = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = DBCFCFAB2D0C53AD0059804A;
+					};
+					DBCFCFCB2D0C53B00059804A = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = DBCFCFAB2D0C53AD0059804A;
+					};
+				};
+			};
+			buildConfigurationList = DBCFCFA72D0C53AD0059804A /* Build configuration list for PBXProject "focusmode" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DBCFCFA32D0C53AD0059804A;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = DBCFCFAD2D0C53AD0059804A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DBCFCFAB2D0C53AD0059804A /* focusmode */,
+				DBCFCFC12D0C53B00059804A /* focusmodeTests */,
+				DBCFCFCB2D0C53B00059804A /* focusmodeUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DBCFCFAA2D0C53AD0059804A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBCFCFC02D0C53B00059804A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBCFCFCA2D0C53B00059804A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DBCFCFA82D0C53AD0059804A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBCFCFBE2D0C53B00059804A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBCFCFC82D0C53B00059804A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DBCFCFC42D0C53B00059804A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DBCFCFAB2D0C53AD0059804A /* focusmode */;
+			targetProxy = DBCFCFC32D0C53B00059804A /* PBXContainerItemProxy */;
+		};
+		DBCFCFCE2D0C53B00059804A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DBCFCFAB2D0C53AD0059804A /* focusmode */;
+			targetProxy = DBCFCFCD2D0C53B00059804A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		DBCFCFD42D0C53B00059804A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DBCFCFD52D0C53B00059804A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		DBCFCFD72D0C53B00059804A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = focusmode/focusmode.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"focusmode/Preview Content\"";
+				DEVELOPMENT_TEAM = ZH7HN3N93K;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = vinayak.focusmode;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DBCFCFD82D0C53B00059804A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = focusmode/focusmode.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"focusmode/Preview Content\"";
+				DEVELOPMENT_TEAM = ZH7HN3N93K;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = vinayak.focusmode;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		DBCFCFDA2D0C53B00059804A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZH7HN3N93K;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = vinayak.focusmodeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/focusmode.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/focusmode";
+			};
+			name = Debug;
+		};
+		DBCFCFDB2D0C53B00059804A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZH7HN3N93K;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = vinayak.focusmodeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/focusmode.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/focusmode";
+			};
+			name = Release;
+		};
+		DBCFCFDD2D0C53B00059804A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZH7HN3N93K;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = vinayak.focusmodeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = focusmode;
+			};
+			name = Debug;
+		};
+		DBCFCFDE2D0C53B00059804A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZH7HN3N93K;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = vinayak.focusmodeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = focusmode;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DBCFCFA72D0C53AD0059804A /* Build configuration list for PBXProject "focusmode" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBCFCFD42D0C53B00059804A /* Debug */,
+				DBCFCFD52D0C53B00059804A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DBCFCFD62D0C53B00059804A /* Build configuration list for PBXNativeTarget "focusmode" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBCFCFD72D0C53B00059804A /* Debug */,
+				DBCFCFD82D0C53B00059804A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DBCFCFD92D0C53B00059804A /* Build configuration list for PBXNativeTarget "focusmodeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBCFCFDA2D0C53B00059804A /* Debug */,
+				DBCFCFDB2D0C53B00059804A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DBCFCFDC2D0C53B00059804A /* Build configuration list for PBXNativeTarget "focusmodeUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBCFCFDD2D0C53B00059804A /* Debug */,
+				DBCFCFDE2D0C53B00059804A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DBCFCFA42D0C53AD0059804A /* Project object */;
+}
