@@ -64,6 +64,7 @@ private struct ControlButtons: View {
                         .padding(.vertical, 1)
                         .background(.primary)
                         .cornerRadius(4)
+                        .fixedSize()
                 }
             }
             .buttonStyle(PlainButtonStyle())
@@ -78,6 +79,7 @@ private struct ControlButtons: View {
             // Timer display
             Text(timerDisplay)
                 .monospacedDigit()
+                .fixedSize()
             
           
             // Tick button
@@ -102,6 +104,7 @@ private struct ControlButtons: View {
                     .foregroundColor(.primary)
             }
             .buttonStyle(PlainButtonStyle())
+            .disabled(taskManager.tasks.isEmpty || taskManager.currentTask == nil || taskManager.currentTask?.title == nil)
             .onHover { isHovered in
                 if isHovered {
                     NSCursor.pointingHand.push()
@@ -150,6 +153,7 @@ struct FloatingTimerView: View {
         self.taskManager = TaskManager.shared  // Initialize taskManager
         self._progressStyle = progressStyle
         let seconds = Int(task.remainingDuration ?? task.duration)
+        print("[Init] Initial seconds set to:", seconds)
         _remainingSeconds = State(initialValue: seconds)
         _startTimeSeconds = State(initialValue: seconds)
         self.initialSeconds = Int(task.duration)
@@ -160,8 +164,8 @@ struct FloatingTimerView: View {
         let minutes = (remainingSeconds % 3600) / 60
         let seconds = remainingSeconds % 60
         
-        print("Current time breakdown - Hours:", hours, "Minutes:", minutes, "Seconds:", seconds)
-        print("Total remaining seconds:", remainingSeconds)
+        print("[TimerDisplay] Current time breakdown - Hours:", hours, "Minutes:", minutes, "Seconds:", seconds)
+        print("[TimerDisplay] Total remaining seconds:", remainingSeconds)
         
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
@@ -194,7 +198,7 @@ struct FloatingTimerView: View {
         ZStack {
             GeometryReader { geometry in
                 ZStack {
-                    if !showCelebration {
+                    if !isAllTasksComplete {
                         progressView(in: geometry)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                         
@@ -220,6 +224,7 @@ struct FloatingTimerView: View {
                                     HStack(spacing: 8) {
                                         Text(timerDisplay)
                                             .monospacedDigit()
+                                            .fixedSize()
                                         
                                         if !taskManager.isWorking {
                                             Button(action: {
@@ -285,12 +290,18 @@ struct FloatingTimerView: View {
     private func startTimer() {
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             // Only update if task is in working state
-            guard taskManager.isWorking else { return }
+            guard taskManager.isWorking else {
+                print("[Timer] Skipped update - task not working")
+                return
+            }
             
+            print("[Timer] Before update - remainingSeconds:", remainingSeconds)
             if remainingSeconds > 0 {
                 remainingSeconds -= 1
+                print("[Timer] After decrement - remainingSeconds:", remainingSeconds)
                 taskManager.updateTaskRemainingDuration(TimeInterval(remainingSeconds))
             } else {
+                print("[Timer] Timer reached zero - completing task")
                 timer.invalidate()
                 completeTask()
             }
@@ -304,9 +315,14 @@ struct FloatingTimerView: View {
         ) { [self] notification in
             guard let userInfo = notification.userInfo,
                   let newTask = userInfo["newTask"] as? Task,
-                  !showCelebration else { return }
+                  !showCelebration else {
+                print("[TaskSwitch] Switch ignored - celebration showing or invalid data")
+                return
+            }
             
+            print("[TaskSwitch] Updating remainingSeconds from:", remainingSeconds)
             remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
+            print("[TaskSwitch] Updated remainingSeconds to:", remainingSeconds)
             startTimeSeconds = remainingSeconds
         }
         

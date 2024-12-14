@@ -22,14 +22,7 @@ struct CelebrationView: View {
                     Text("Great job today!")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                } else {
-                    Text("\(taskTitle) Complete! 🎉")
-                        .font(.headline)
-                    
-                    Text("Moving to next task...")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                } 
             }
             
             Spacer()
