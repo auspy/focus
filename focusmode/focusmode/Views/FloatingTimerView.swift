@@ -119,7 +119,13 @@ struct FloatingTimerView: View {
                     if showCelebration {
                         CelebrationView(
                             isAllTasksComplete: isAllTasksComplete,
-                            taskTitle: currentTask?.title ?? ""
+                            taskTitle: currentTask?.title ?? "",
+                            onComplete: {
+                                showCelebration = false
+                                if !isAllTasksComplete {
+                                    taskManager.completeCurrentTask()
+                                }
+                            }
                         )
                     } else {
                         HStack(spacing: 0) {
@@ -183,18 +189,19 @@ struct FloatingTimerView: View {
             isHovering = hovering
         }
         .onAppear {
+            // Initialize state first
+            if let task = currentTask {
+                remainingSeconds = Int(task.remainingDuration ?? task.duration)
+                showCelebration = false
+            }
+            
+            // Start timer after initialization
             startTimer()
+            
             if progressStyle == .wave {
                 withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
                     waveOffset = .pi * 2
                 }
-            }
-            
-            // Update initial state if needed
-            if let task = currentTask {
-                remainingSeconds = Int(task.remainingDuration ?? task.duration)
-                // Reset celebration state when a task is present
-                showCelebration = false
             }
         }
         .onChange(of: currentTask?.id) { _ in
@@ -254,16 +261,8 @@ struct FloatingTimerView: View {
     }
     
     private func completeTask() {
-        guard let currentTask = taskManager.currentTask else { return }
-        
-        // Show celebration
+        guard taskManager.currentTask != nil else { return }
         showCelebration = true
-        
-        // After brief celebration, complete the task and move to next
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            showCelebration = false
-            taskManager.completeCurrentTask()
-        }
     }
 }
 

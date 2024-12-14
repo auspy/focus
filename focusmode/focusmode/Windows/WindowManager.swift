@@ -118,7 +118,7 @@ class WindowManager: NSObject, ObservableObject {
         isManuallyClosed = manually
         
         if manually {
-            TaskManager.shared.toggleWorkingState()
+            TaskManager.shared.closeWorkingState()
         }
         
         floatingWindow?.close()

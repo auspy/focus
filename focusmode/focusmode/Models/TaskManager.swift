@@ -69,6 +69,11 @@ class TaskManager: ObservableObject {
             userInfo: ["task": currentTask as Any]
         )
     }
+
+    func closeWorkingState() {
+        isWorking = false
+        currentTask = nil
+    }
     
     func startTask(_ task: Task) {
         var updatedTask = task
