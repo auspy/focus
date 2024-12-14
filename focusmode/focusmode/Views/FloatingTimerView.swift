@@ -120,6 +120,7 @@ struct FloatingTimerView: View {
     @State private var remainingSeconds: Int
     @State private var waveOffset = 0.0
     @State private var showCelebration = false
+    @State private var isTimerPaused = false
     
     // Constants for customization
     private let progressColor = Color(hex: "#007AFF") // Apple's default blue
@@ -191,32 +192,20 @@ struct FloatingTimerView: View {
         ZStack {
             GeometryReader { geometry in
                 ZStack {
-                    progressView(in: geometry)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    
-                    if showCelebration {
-                        CelebrationView(
-                            isAllTasksComplete: isAllTasksComplete,
-                            taskTitle: currentTask?.title ?? "",
-                            onComplete: {
-                                showCelebration = false
-                                if !isAllTasksComplete {
-                                    taskManager.completeCurrentTask()
-                                }
-                            }
-                        )
-                    } else {
+                    if !showCelebration {
+                        progressView(in: geometry)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        
                         HStack(spacing: 0) {
-                            // Text on left
+                            // Timer content
                             Text(currentTask?.title ?? "No Task")
                                 .lineLimit(1)
                                 .truncationMode(.tail)
                                 .padding(.leading)
-                                // .frame(minWidth: 100)
                             
                             Spacer()
                             
-                            // Timer and control button on right
+                            // Timer and control buttons
                             HStack(spacing: 12) {
                                 if isHovering {
                                     ControlButtons(
@@ -230,7 +219,6 @@ struct FloatingTimerView: View {
                                         Text(timerDisplay)
                                             .monospacedDigit()
                                         
-                                        // Always show play button when paused
                                         if !taskManager.isWorking {
                                             Button(action: {
                                                 taskManager.toggleWorkingState()
@@ -252,6 +240,14 @@ struct FloatingTimerView: View {
                             }
                             .padding(.trailing)
                         }
+                    } else {
+                        CelebrationView(
+                            isAllTasksComplete: isAllTasksComplete,
+                            taskTitle: currentTask?.title ?? "",
+                            onComplete: {
+                                showCelebration = false
+                            }
+                        )
                     }
                 }
             }
@@ -266,6 +262,7 @@ struct FloatingTimerView: View {
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
                 showCelebration = false
+                isTimerPaused = false
             }
             
             // Start timer after initialization
@@ -275,8 +272,6 @@ struct FloatingTimerView: View {
             // Update when current task changes
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
-                // Reset celebration state when switching to a new task
-                showCelebration = false
             }
         }
         .onChange(of: taskManager.tasks) { oldTasks, newTasks in
@@ -289,15 +284,14 @@ struct FloatingTimerView: View {
     
     private func startTimer() {
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            guard taskManager.isWorking else { return }
+            // Add check for current task
             
             if remainingSeconds > 0 {
                 remainingSeconds -= 1
-                // Update task remaining duration through TaskManager
                 taskManager.updateTaskRemainingDuration(TimeInterval(remainingSeconds))
             } else {
                 timer.invalidate()
-                taskManager.completeCurrentTask()
+                completeTask()
             }
         }
         
@@ -308,12 +302,10 @@ struct FloatingTimerView: View {
             queue: .main
         ) { [self] notification in
             guard let userInfo = notification.userInfo,
-                  let newTask = userInfo["newTask"] as? Task else { return }
+                  let newTask = userInfo["newTask"] as? Task,
+                  !showCelebration else { return }
             
-            // Update timer with new task's remaining duration
             remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
-            // Only reset celebration, isAllTasksComplete is now computed
-            showCelebration = false
         }
         
         // Listen for all tasks completed
@@ -322,8 +314,9 @@ struct FloatingTimerView: View {
             object: nil,
             queue: .main
         ) { [self] _ in
+            // Only reset timer if this is actually the current task being completed
+            guard taskManager.tasks.isEmpty && currentTask == nil else { return }
             remainingSeconds = 0
-            showCelebration = true
         }
         
         // Listen for time additions
@@ -333,15 +326,31 @@ struct FloatingTimerView: View {
             queue: .main
         ) { [self] notification in
             guard let userInfo = notification.userInfo,
-                  let addedSeconds = userInfo["addedSeconds"] as? TimeInterval else { return }
+                  let addedSeconds = userInfo["addedSeconds"] as? TimeInterval,
+                  !showCelebration else { return }
             
             remainingSeconds += Int(addedSeconds)
         }
     }
     
     private func completeTask() {
-        guard taskManager.currentTask != nil else { return }
+        
+        // 1. Show celebration immediately
         showCelebration = true
+        
+        // 2. Capture if this was the last task
+        let wasLastTask = taskManager.tasks.count <= 1
+        
+        // 3. Schedule state updates to happen after celebration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            // Update task state
+            self.taskManager.completeCurrentTask()
+            
+            // If it was the last task, show the final celebration
+            if wasLastTask {
+                self.showCelebration = true
+            }
+        }
     }
 }
 

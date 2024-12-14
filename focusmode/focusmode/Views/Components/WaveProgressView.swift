@@ -7,24 +7,36 @@ struct WaveProgressView: View {
     
     @State private var phase: CGFloat = 0
     
+    var waveColor: Color {
+        isAnimating ? color : .yellow
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             WaveShape(
                 progress: progress,
-                waveHeight: 4,
+                waveHeight: isAnimating ? 4 : 2,
                 offset: phase
             )
-            .fill(color)
+            .fill(waveColor)
             .frame(width: geometry.size.width)
         }
         .onAppear {
-            withAnimation(isAnimating ? .linear(duration: 2).repeatForever(autoreverses: false) : nil) {
-                phase = .pi * 2
+            if isAnimating {
+                withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
+                    phase = .pi * 2
+                }
             }
         }
         .onChange(of: isAnimating) { _, newValue in
-            withAnimation(newValue ? .linear(duration: 2).repeatForever(autoreverses: false) : nil) {
-                phase = .pi * 2
+            if newValue {
+                withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
+                    phase = .pi * 2
+                }
+            } else {
+                withAnimation(.linear(duration: 0)) {
+                    phase = phase.truncatingRemainder(dividingBy: .pi * 2)
+                }
             }
         }
     }
