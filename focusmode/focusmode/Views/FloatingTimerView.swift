@@ -96,9 +96,10 @@ struct FloatingTimerView: View {
         switch progressStyle {
         case .wave:
             WaveProgressView(
-                progress: calculateTaskProgress(taskManager.currentTask),
+                progress: progress,
                 color: progressColor
             )
+            .frame(height: geometry.size.height)
             .animation(.linear(duration: 2), value: progress)
             
         case .linear:
@@ -110,62 +111,69 @@ struct FloatingTimerView: View {
     
     var body: some View {
         ZStack {
-            if showCelebration {
-                CelebrationView(
-                    isAllTasksComplete: isAllTasksComplete,
-                    taskTitle: currentTask?.title ?? ""
-                )
-            } else {
-                HStack(spacing: 0) {
-                    // Text on left
-                    Text(currentTask?.title ?? "No Task")
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .padding(.leading)
-                        // .frame(minWidth: 100)
+            GeometryReader { geometry in
+                ZStack {
+                    progressView(in: geometry)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     
-                    Spacer()
-                    
-                    // Timer and control button on right
-                    HStack(spacing: 12) {
-                        Text(timerDisplay)
-                            .monospacedDigit()
-                        
-                        // Only show buttons when hovering
-                        if isHovering {
-                            HStack(spacing: 8) { // Added spacing between buttons
-                                Button(action: {
-                                    taskManager.toggleWorkingState()
-                                }) {
-                                    Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
-                                        .foregroundColor(.primary)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                .onHover { isHovered in
-                                    if isHovered {
-                                        NSCursor.pointingHand.push()
-                                    } else {
-                                        NSCursor.pop()
-                                    }
-                                }
+                    if showCelebration {
+                        CelebrationView(
+                            isAllTasksComplete: isAllTasksComplete,
+                            taskTitle: currentTask?.title ?? ""
+                        )
+                    } else {
+                        HStack(spacing: 0) {
+                            // Text on left
+                            Text(currentTask?.title ?? "No Task")
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .padding(.leading)
+                                // .frame(minWidth: 100)
+                            
+                            Spacer()
+                            
+                            // Timer and control button on right
+                            HStack(spacing: 12) {
+                                Text(timerDisplay)
+                                    .monospacedDigit()
                                 
-                                // New tick button
-                                Button(action: completeTask) {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                .onHover { isHovered in
-                                    if isHovered {
-                                        NSCursor.pointingHand.push()
-                                    } else {
-                                        NSCursor.pop()
+                                // Only show buttons when hovering
+                                if isHovering {
+                                    HStack(spacing: 8) { // Added spacing between buttons
+                                        Button(action: {
+                                            taskManager.toggleWorkingState()
+                                        }) {
+                                            Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
+                                                .foregroundColor(.primary)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                        .onHover { isHovered in
+                                            if isHovered {
+                                                NSCursor.pointingHand.push()
+                                            } else {
+                                                NSCursor.pop()
+                                            }
+                                        }
+                                        
+                                        // New tick button
+                                        Button(action: completeTask) {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundColor(.green)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                        .onHover { isHovered in
+                                            if isHovered {
+                                                NSCursor.pointingHand.push()
+                                            } else {
+                                                NSCursor.pop()
+                                            }
+                                        }
                                     }
                                 }
                             }
+                            .padding(.trailing)
                         }
                     }
-                    .padding(.trailing)
                 }
             }
         }
