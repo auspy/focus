@@ -79,12 +79,11 @@ private struct ControlButtons: View {
             Text(timerDisplay)
                 .monospacedDigit()
             
-            // Play/Pause button
-            Button(action: {
-                taskManager.toggleWorkingState()
-            }) {
-                Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
-                    .foregroundColor(.primary)
+          
+            // Tick button
+            Button(action: completeTask) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
             }
             .buttonStyle(PlainButtonStyle())
             .onHover { isHovered in
@@ -94,11 +93,13 @@ private struct ControlButtons: View {
                     NSCursor.pop()
                 }
             }
-            
-            // Tick button
-            Button(action: completeTask) {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
+
+              // Play/Pause button
+            Button(action: {
+                taskManager.toggleWorkingState()
+            }) {
+                Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
+                    .foregroundColor(.primary)
             }
             .buttonStyle(PlainButtonStyle())
             .onHover { isHovered in
@@ -178,7 +179,6 @@ struct FloatingTimerView: View {
                 isAnimating: taskManager.isWorking
             )
             .frame(height: geometry.size.height)
-            .animation(.linear(duration: 2), value: progress)
             
         case .linear:
             currentProgressColor
@@ -270,12 +270,6 @@ struct FloatingTimerView: View {
             
             // Start timer after initialization
             startTimer()
-            
-            if progressStyle == .wave {
-                withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
-                    waveOffset = .pi * 2
-                }
-            }
         }
         .onChange(of: currentTask?.id) { oldValue, newValue in
             // Update when current task changes
