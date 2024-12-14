@@ -203,11 +203,11 @@ struct AddTaskView: View {
             .frame(width: 300)
             .background(AppColors.background)
         .frame(width: 300)
-        .onChange(of: hours) { newValue in
+        .onChange(of: hours) { oldValue, newValue in
             if newValue < 0 { hours = 0 }
             if newValue > 24 { hours = 24 }
         }
-        .onChange(of: minutes) { newValue in
+        .onChange(of: minutes) { oldValue, newValue in
             if newValue < 0 { minutes = 0 }
             if newValue > 59 { minutes = 59 }
             if hours == 24 { minutes = 0 }

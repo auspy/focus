@@ -3,21 +3,28 @@ import SwiftUI
 struct WaveProgressView: View {
     let progress: CGFloat
     let color: Color
-    @State private var waveOffset = 0.0
+    let isAnimating: Bool
+    
+    @State private var phase: CGFloat = 0
     
     var body: some View {
         GeometryReader { geometry in
             WaveShape(
                 progress: progress,
                 waveHeight: 4,
-                offset: waveOffset
+                offset: phase
             )
             .fill(color)
             .frame(width: geometry.size.width)
-            .onAppear {
-                withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
-                    waveOffset = .pi * 2
-                }
+        }
+        .onAppear {
+            withAnimation(isAnimating ? .linear(duration: 2).repeatForever(autoreverses: false) : nil) {
+                phase = .pi * 2
+            }
+        }
+        .onChange(of: isAnimating) { _, newValue in
+            withAnimation(newValue ? .linear(duration: 2).repeatForever(autoreverses: false) : nil) {
+                phase = .pi * 2
             }
         }
     }

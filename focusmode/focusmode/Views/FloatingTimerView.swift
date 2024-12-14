@@ -45,8 +45,75 @@ struct ProgressStylePicker: View {
     }
 }
 
+private struct ControlButtons: View {
+    let taskManager: TaskManager
+    let completeTask: () -> Void
+    let timerDisplay: String
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            // +5 button
+            Button(action: {
+                taskManager.addTime(minutes: 5)
+            }) {
+                HStack(spacing: 2) {
+                    Text("+5m")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(AppColors.background)
+                        .padding(.horizontal, 2)
+                        .padding(.vertical, 1)
+                        .background(.primary)
+                        .cornerRadius(4)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .onHover { isHovered in
+                if isHovered {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
+            
+            // Timer display
+            Text(timerDisplay)
+                .monospacedDigit()
+            
+            // Play/Pause button
+            Button(action: {
+                taskManager.toggleWorkingState()
+            }) {
+                Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
+                    .foregroundColor(.primary)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .onHover { isHovered in
+                if isHovered {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
+            
+            // Tick button
+            Button(action: completeTask) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .onHover { isHovered in
+                if isHovered {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
+        }
+    }
+}
+
 struct FloatingTimerView: View {
-    @StateObject private var taskManager = TaskManager.shared
+    @ObservedObject var taskManager: TaskManager
     @Binding var progressStyle: ProgressStyle
     @State private var isHovering = false
     @State private var remainingSeconds: Int
@@ -67,7 +134,17 @@ struct FloatingTimerView: View {
         taskManager.tasks.isEmpty && currentTask == nil
     }
     
+    // Add computed property for progress color
+    private var currentProgressColor: Color {
+        // If less than 10% time remaining, show red
+        if progress > 0.9 {
+            return .red
+        }
+        return progressColor
+    }
+    
     init(task: Task, progressStyle: Binding<ProgressStyle>) {
+        self.taskManager = TaskManager.shared  // Initialize taskManager
         self._progressStyle = progressStyle
         let seconds = Int(task.remainingDuration ?? task.duration)
         _remainingSeconds = State(initialValue: seconds)
@@ -97,13 +174,14 @@ struct FloatingTimerView: View {
         case .wave:
             WaveProgressView(
                 progress: progress,
-                color: progressColor
+                color: currentProgressColor,
+                isAnimating: taskManager.isWorking
             )
             .frame(height: geometry.size.height)
             .animation(.linear(duration: 2), value: progress)
             
         case .linear:
-            progressColor
+            currentProgressColor
                 .frame(width: geometry.size.width * progress)
                 .animation(.linear(duration: 0.1), value: progress)
         }
@@ -140,38 +218,33 @@ struct FloatingTimerView: View {
                             
                             // Timer and control button on right
                             HStack(spacing: 12) {
-                                Text(timerDisplay)
-                                    .monospacedDigit()
-                                
-                                // Only show buttons when hovering
                                 if isHovering {
-                                    HStack(spacing: 8) { // Added spacing between buttons
-                                        Button(action: {
-                                            taskManager.toggleWorkingState()
-                                        }) {
-                                            Image(systemName: taskManager.isWorking ? "pause.fill" : "play.fill")
-                                                .foregroundColor(.primary)
-                                        }
-                                        .buttonStyle(PlainButtonStyle())
-                                        .onHover { isHovered in
-                                            if isHovered {
-                                                NSCursor.pointingHand.push()
-                                            } else {
-                                                NSCursor.pop()
-                                            }
-                                        }
+                                    ControlButtons(
+                                        taskManager: taskManager,
+                                        completeTask: completeTask,
+                                        timerDisplay: timerDisplay
+                                    )
+                                } else {
+                                    // Show timer and play button when paused
+                                    HStack(spacing: 8) {
+                                        Text(timerDisplay)
+                                            .monospacedDigit()
                                         
-                                        // New tick button
-                                        Button(action: completeTask) {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .foregroundColor(.green)
-                                        }
-                                        .buttonStyle(PlainButtonStyle())
-                                        .onHover { isHovered in
-                                            if isHovered {
-                                                NSCursor.pointingHand.push()
-                                            } else {
-                                                NSCursor.pop()
+                                        // Always show play button when paused
+                                        if !taskManager.isWorking {
+                                            Button(action: {
+                                                taskManager.toggleWorkingState()
+                                            }) {
+                                                Image(systemName: "play.fill")
+                                                    .foregroundColor(.primary)
+                                            }
+                                            .buttonStyle(PlainButtonStyle())
+                                            .onHover { isHovered in
+                                                if isHovered {
+                                                    NSCursor.pointingHand.push()
+                                                } else {
+                                                    NSCursor.pop()
+                                                }
                                             }
                                         }
                                     }
@@ -204,7 +277,7 @@ struct FloatingTimerView: View {
                 }
             }
         }
-        .onChange(of: currentTask?.id) { _ in
+        .onChange(of: currentTask?.id) { oldValue, newValue in
             // Update when current task changes
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
@@ -212,9 +285,9 @@ struct FloatingTimerView: View {
                 showCelebration = false
             }
         }
-        .onChange(of: taskManager.tasks) { tasks in
+        .onChange(of: taskManager.tasks) { oldTasks, newTasks in
             // If tasks were added (list is not empty), reset celebration
-            if !tasks.isEmpty {
+            if !newTasks.isEmpty {
                 showCelebration = false
             }
         }
@@ -257,6 +330,18 @@ struct FloatingTimerView: View {
         ) { [self] _ in
             remainingSeconds = 0
             showCelebration = true
+        }
+        
+        // Listen for time additions
+        NotificationCenter.default.addObserver(
+            forName: .taskTimeAdded,
+            object: nil,
+            queue: .main
+        ) { [self] notification in
+            guard let userInfo = notification.userInfo,
+                  let addedSeconds = userInfo["addedSeconds"] as? TimeInterval else { return }
+            
+            remainingSeconds += Int(addedSeconds)
         }
     }
     

@@ -164,6 +164,39 @@ class TaskManager: ObservableObject {
         // Update order in repository
         saveChanges()
     }
+    
+    func addTime(minutes: Int) {
+        guard var currentTask = currentTask else { return }
+        let additionalSeconds = TimeInterval(minutes * 60)
+        currentTask.duration += additionalSeconds
+        
+        // Also update remaining duration
+        if let remainingDuration = currentTask.remainingDuration {
+            currentTask.remainingDuration = remainingDuration + additionalSeconds
+        } else {
+            currentTask.remainingDuration = currentTask.duration
+        }
+        
+        // Update in tasks array
+        if let index = tasks.firstIndex(where: { $0.id == currentTask.id }) {
+            tasks[index] = currentTask
+        }
+        
+        // Update in repository
+        repository.saveTask(currentTask)
+        
+        // Update current task reference
+        self.currentTask = currentTask
+        
+        // Notify observers
+        NotificationCenter.default.post(
+            name: .taskTimeAdded,
+            object: nil,
+            userInfo: ["task": currentTask, "addedSeconds": additionalSeconds]
+        )
+        
+        objectWillChange.send()
+    }
 }
 
 extension Notification.Name {
@@ -171,4 +204,5 @@ extension Notification.Name {
     static let taskPaused = Notification.Name("taskPaused")
     static let taskSwitched = Notification.Name("taskSwitched")
     static let allTasksCompleted = Notification.Name("allTasksCompleted")
+    static let taskTimeAdded = Notification.Name("taskTimeAdded")
 } 
