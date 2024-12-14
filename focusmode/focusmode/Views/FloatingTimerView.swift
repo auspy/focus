@@ -118,6 +118,7 @@ struct FloatingTimerView: View {
     @Binding var progressStyle: ProgressStyle
     @State private var isHovering = false
     @State private var remainingSeconds: Int
+    @State private var startTimeSeconds: Int
     @State private var waveOffset = 0.0
     @State private var showCelebration = false
     @State private var isTimerPaused = false
@@ -150,6 +151,7 @@ struct FloatingTimerView: View {
         self._progressStyle = progressStyle
         let seconds = Int(task.remainingDuration ?? task.duration)
         _remainingSeconds = State(initialValue: seconds)
+        _startTimeSeconds = State(initialValue: seconds)
         self.initialSeconds = Int(task.duration)
     }
     
@@ -166,8 +168,8 @@ struct FloatingTimerView: View {
     
     private var progress: CGFloat {
         // Calculate progress from 0.0 to 1.0
-        let elapsed = initialSeconds - remainingSeconds
-        return CGFloat(elapsed) / CGFloat(initialSeconds)
+        let elapsed = startTimeSeconds - remainingSeconds
+        return CGFloat(elapsed) / CGFloat(startTimeSeconds)
     }
     
     @ViewBuilder
@@ -243,10 +245,7 @@ struct FloatingTimerView: View {
                     } else {
                         CelebrationView(
                             isAllTasksComplete: isAllTasksComplete,
-                            taskTitle: currentTask?.title ?? "",
-                            onComplete: {
-                                showCelebration = false
-                            }
+                            taskTitle: currentTask?.title ?? ""
                         )
                     }
                 }
@@ -261,6 +260,7 @@ struct FloatingTimerView: View {
             // Initialize state first
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
+                startTimeSeconds = remainingSeconds
                 showCelebration = false
                 isTimerPaused = false
             }
@@ -272,6 +272,7 @@ struct FloatingTimerView: View {
             // Update when current task changes
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
+                startTimeSeconds = remainingSeconds
             }
         }
         .onChange(of: taskManager.tasks) { oldTasks, newTasks in
@@ -284,7 +285,8 @@ struct FloatingTimerView: View {
     
     private func startTimer() {
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            // Add check for current task
+            // Only update if task is in working state
+            guard taskManager.isWorking else { return }
             
             if remainingSeconds > 0 {
                 remainingSeconds -= 1
@@ -306,6 +308,7 @@ struct FloatingTimerView: View {
                   !showCelebration else { return }
             
             remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
+            startTimeSeconds = remainingSeconds
         }
         
         // Listen for all tasks completed
@@ -330,6 +333,7 @@ struct FloatingTimerView: View {
                   !showCelebration else { return }
             
             remainingSeconds += Int(addedSeconds)
+            startTimeSeconds = remainingSeconds
         }
     }
     
@@ -337,37 +341,15 @@ struct FloatingTimerView: View {
         
         // 1. Show celebration immediately
         showCelebration = true
-        
-        // 2. Capture if this was the last task
-        let wasLastTask = taskManager.tasks.count <= 1
-        
-        // 3. Schedule state updates to happen after celebration
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            // Update task state
-            self.taskManager.completeCurrentTask()
-            
-            // If it was the last task, show the final celebration
-            if wasLastTask {
-                self.showCelebration = true
-            }
-        }
-    }
-}
 
-// Preview provider for SwiftUI canvas
-struct FloatingTimerView_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(spacing: 20) {
-            ProgressStylePicker(selectedStyle: .constant(.wave))
-                .previewLayout(.sizeThatFits)
-            
-            VStack {
-                FloatingTimerView(task: Task(title: "Wave Style", duration: 25), 
-                                progressStyle: .constant(.wave))
-                FloatingTimerView(task: Task(title: "Linear Style", duration: 25), 
-                                progressStyle: .constant(.linear))
-            }
-        }
+        // 2. Complete the current task and await for the update
+        taskManager.completeCurrentTask()
+
+        // 3. Hide celebration after task is updated
+        // Keep showing celebration for a moment after task completion
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            self.showCelebration = false
+        } 
     }
 }
 

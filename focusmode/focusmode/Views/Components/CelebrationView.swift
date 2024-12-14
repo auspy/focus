@@ -5,7 +5,6 @@ struct CelebrationView: View {
     @State private var counter = 0
     let isAllTasksComplete: Bool
     let taskTitle: String
-    let onComplete: () -> Void
     
     var body: some View {
         HStack(spacing: 16) {
@@ -45,16 +44,13 @@ struct CelebrationView: View {
                        radius: 200)
         .onAppear {
             counter += 1
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                onComplete()
-            }
         }
     }
 }
 
 struct CelebrationView_Previews: PreviewProvider {
     static var previews: some View {
-        CelebrationView(isAllTasksComplete: true, taskTitle: "Sample Task", onComplete: {})
-        CelebrationView(isAllTasksComplete: false, taskTitle: "Sample Task", onComplete: {})
+        CelebrationView(isAllTasksComplete: true, taskTitle: "Sample Task")
+        CelebrationView(isAllTasksComplete: false, taskTitle: "Sample Task")
     }
 } 
