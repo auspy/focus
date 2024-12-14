@@ -7,13 +7,62 @@ class TaskManager: ObservableObject {
     @Published var tasks: [Task] = []
     @Published private(set) var isWorking = false
     
-    private init() {
+    private let repository: TaskRepository
+    
+    init(repository: TaskRepository? = nil) {
+        self.repository = repository ?? CoreDataTaskRepository(context: PersistenceController.shared.container.viewContext)
         loadTasks()
+    }
+    
+    // MARK: - Persistence
+    private func loadTasks() {
+        tasks = repository.fetchTasks()
+    }
+    
+    private func saveChanges() {
+        repository.updateTaskOrder(tasks: tasks)
+    }
+    
+    func addTask(title: String, duration: TimeInterval) {
+        let task = Task(title: title, duration: duration)
+        if !tasks.contains(where: { $0.id == task.id }) {
+            tasks.append(task)
+            repository.saveTask(task)
+            saveChanges()
+        } else {
+            print("Warning: Attempted to add task with duplicate ID")
+        }
+    }
+    
+    func deleteTask(_ task: Task) {
+        tasks.removeAll { $0.id == task.id }
+        repository.deleteTask(id: task.id)
+        if currentTask?.id == task.id {
+            currentTask = nil
+        }
+        saveChanges()
+    }
+    
+    func updateTaskRemainingDuration(_ duration: TimeInterval) {
+        guard let currentTaskId = currentTask?.id,
+              let index = tasks.firstIndex(where: { $0.id == currentTaskId }) else { return }
+        
+        tasks[index].remainingDuration = duration
+        currentTask = tasks[index]
+        repository.updateTaskRemainingDuration(id: currentTaskId, duration: duration)
     }
     
     func toggleWorkingState() {
         isWorking.toggle()
-        // Notify state change
+        
+        // Update task status
+        if var task = currentTask {
+            task.status = isWorking ? .inProgress : .paused
+            // Update in repository
+            repository.saveTask(task)
+            currentTask = task
+        }
+        
         NotificationCenter.default.post(
             name: isWorking ? .taskStarted : .taskPaused,
             object: nil,
@@ -22,25 +71,33 @@ class TaskManager: ObservableObject {
     }
     
     func startTask(_ task: Task) {
-        currentTask = task
+        var updatedTask = task
+        updatedTask.status = .inProgress
+        currentTask = updatedTask
         isWorking = true
-        // Notify floating timer to start
+        
+        // Update task status in repository
+        repository.saveTask(updatedTask)
+        
         NotificationCenter.default.post(
             name: .taskStarted,
             object: nil,
-            userInfo: ["task": task]
+            userInfo: ["task": updatedTask]
         )
     }
     
     func completeCurrentTask() {
         guard var currentTask = currentTask else { return }
         
-        // Update completion time
+        // Update completion time and status
         currentTask.completedAt = Date()
+        currentTask.status = .completed
         
         // Remove from active tasks list
         if let index = tasks.firstIndex(where: { $0.id == currentTask.id }) {
             tasks.remove(at: index)
+            // Delete from persistent storage since it's completed
+            repository.deleteTask(id: currentTask.id)
         }
         
         // Stop working state first
@@ -56,34 +113,10 @@ class TaskManager: ObservableObject {
             )
         } else {
             self.currentTask = nil
-            // Notify that all tasks are completed
             NotificationCenter.default.post(name: .allTasksCompleted, object: nil)
         }
         
-        // Notify observers about task completion
         objectWillChange.send()
-    }
-    
-    func addTask(title: String, duration: TimeInterval) {
-        let task = Task(title: title, duration: duration)
-        tasks.append(task)
-        saveChanges()
-    }
-    
-    func deleteTask(_ task: Task) {
-        tasks.removeAll { $0.id == task.id }
-        if currentTask?.id == task.id {
-            currentTask = nil
-        }
-        saveChanges()
-    }
-    
-    func updateTaskRemainingDuration(_ duration: TimeInterval) {
-        guard let currentTaskId = currentTask?.id,
-              let index = tasks.firstIndex(where: { $0.id == currentTaskId }) else { return }
-        
-        tasks[index].remainingDuration = duration
-        currentTask = tasks[index]
     }
     
     func moveTask(from source: IndexSet, to destination: Int) {
@@ -102,37 +135,29 @@ class TaskManager: ObservableObject {
             // Store progress of current task before switching
             updateTaskRemainingDuration(TimeInterval(currentTask.remainingDuration ?? currentTask.duration))
             
+            // Update status of old task
+            var oldTask = currentTask
+            oldTask.status = .paused
+            repository.saveTask(oldTask)
+            
             // Pause current task
             isWorking = false
             
             // Switch to new top task
             self.currentTask = newTopTask
             
-            // Notify about task switch
             NotificationCenter.default.post(
                 name: .taskSwitched,
                 object: nil,
                 userInfo: [
-                    "oldTask": currentTask,
+                    "oldTask": oldTask,
                     "newTask": newTopTask
                 ]
             )
         }
         
+        // Update order in repository
         saveChanges()
-    }
-    
-    // MARK: - Persistence
-    private func loadTasks() {
-        // TODO: Replace with actual persistence implementation
-        // For now, just initialize with empty array
-        tasks = []
-    }
-    
-    private func saveChanges() {
-        // TODO: Replace with actual persistence implementation
-        // For now, just print for debugging
-        print("Saving tasks: \(tasks)")
     }
 }
 

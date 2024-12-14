@@ -1,7 +1,7 @@
 import Foundation
 
 struct Task: Identifiable, Equatable {
-    let id: UUID
+    let id: String
     var title: String
     var duration: TimeInterval
     var remainingDuration: TimeInterval?
@@ -9,10 +9,19 @@ struct Task: Identifiable, Equatable {
     var completedAt: Date?
     
     init(title: String, duration: TimeInterval) {
-        self.id = UUID()
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let random = Int.random(in: 0...999999)
+        self.id = "\(timestamp)-\(random)"
         self.title = title
         self.duration = duration
         self.status = .notStarted
+    }
+    
+    init(id: String, title: String, duration: TimeInterval, status: TaskStatus = .notStarted) {
+        self.id = id
+        self.title = title
+        self.duration = duration
+        self.status = status
     }
     
     static func == (lhs: Task, rhs: Task) -> Bool {

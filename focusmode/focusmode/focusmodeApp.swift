@@ -9,10 +9,13 @@ import SwiftUI
 
 @main
 struct focusmodeApp: App {
+    // Initialize Core Data
+    let persistenceController = PersistenceController.shared
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .frame(minWidth: 400, minHeight: 500)
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
 }
