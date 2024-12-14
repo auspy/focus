@@ -261,7 +261,6 @@ struct FloatingTimerView: View {
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
                 startTimeSeconds = remainingSeconds
-                showCelebration = false
                 isTimerPaused = false
             }
             
@@ -345,11 +344,13 @@ struct FloatingTimerView: View {
         // 2. Complete the current task and await for the update
         taskManager.completeCurrentTask()
 
-        // 3. Hide celebration after task is updated
+        // 3. Hide celebration after task is updated, but only if there are remaining tasks
         // Keep showing celebration for a moment after task completion
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            self.showCelebration = false
-        } 
+        if !taskManager.tasks.isEmpty {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                self.showCelebration = false
+            }
+        }
     }
 }
 
