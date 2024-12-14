@@ -1,5 +1,13 @@
 import Foundation
 
+// Define pending operations that need to be synced with the database
+private enum PendingOperation {
+    case complete(Task)
+    case delete(String)  // Task ID
+    case update(Task)
+    case updateOrder([Task])
+}
+
 class TaskManager: ObservableObject {
     static let shared = TaskManager()
     
@@ -8,6 +16,7 @@ class TaskManager: ObservableObject {
     @Published private(set) var isWorking = false
     
     private let repository: TaskRepository
+    private var pendingOperations: [PendingOperation] = []  // Queue for pending operations
     
     init(repository: TaskRepository? = nil) {
         self.repository = repository ?? CoreDataTaskRepository(context: PersistenceController.shared.container.viewContext)
@@ -94,19 +103,20 @@ class TaskManager: ObservableObject {
     func completeCurrentTask() {
         guard var currentTask = currentTask else { return }
         
-        // Update completion time and status
+        // 1. Update memory state immediately
         currentTask.completedAt = Date()
         currentTask.status = .completed
         
-        // Remove from active tasks list
+        // Remove from active tasks list in memory
         if let index = tasks.firstIndex(where: { $0.id == currentTask.id }) {
             tasks.remove(at: index)
-            // Delete from persistent storage since it's completed
-            repository.deleteTask(id: currentTask.id)
         }
         
-        // Stop working state first
+        // Stop working state
         isWorking = false
+        
+        // Queue the database operation
+        pendingOperations.append(.complete(currentTask))
         
         // Move to next task if available
         if !tasks.isEmpty {
@@ -121,7 +131,11 @@ class TaskManager: ObservableObject {
             NotificationCenter.default.post(name: .allTasksCompleted, object: nil)
         }
         
+        // Trigger UI update
         objectWillChange.send()
+        
+        // Process pending operations in background
+        processPendingOperations()
     }
     
     func moveTask(from source: IndexSet, to destination: Int) {
@@ -196,6 +210,33 @@ class TaskManager: ObservableObject {
         )
         
         objectWillChange.send()
+    }
+    
+    // Helper method to process pending operations
+    private func processPendingOperations() {
+        guard !pendingOperations.isEmpty else { return }
+        
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let self = self else { return }
+            
+            // Take the first pending operation
+            DispatchQueue.main.sync {
+                guard let operation = self.pendingOperations.first else { return }
+                self.pendingOperations.removeFirst()
+                
+                // Process the operation
+                switch operation {
+                case .complete(let task):
+                    self.repository.deleteTask(id: task.id)
+                case .delete(let taskId):
+                    self.repository.deleteTask(id: taskId)
+                case .update(let task):
+                    self.repository.saveTask(task)
+                case .updateOrder(let tasks):
+                    self.repository.updateTaskOrder(tasks: tasks)
+                }
+            }
+        }
     }
 }
 

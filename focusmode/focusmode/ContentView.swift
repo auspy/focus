@@ -31,7 +31,8 @@ struct ContentView: View {
                 if taskManager.isWorking {
                     WaveProgressView(
                         progress: calculateTaskProgress(taskManager.currentTask),
-                        color: Color.accentColor
+                        color: Color.accentColor,
+                        isAnimating: taskManager.isWorking
                     )
                 }
                 
