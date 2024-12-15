@@ -104,7 +104,7 @@ private struct ControlButtons: View {
                     .foregroundColor(.primary)
             }
             .buttonStyle(PlainButtonStyle())
-            .disabled(taskManager.tasks.isEmpty || taskManager.currentTask == nil || taskManager.currentTask?.title == nil)
+            .disabled(taskManager.tasks.isEmpty || taskManager.currentTask == nil || taskManager.currentTask?.title == nil || taskManager.currentTask?.title == "No Task" || taskManager.currentTask?.remainingDuration == nil || (taskManager.currentTask?.remainingDuration ?? 0) <= 0)
             .onHover { isHovered in
                 if isHovered {
                     NSCursor.pointingHand.push()
@@ -301,9 +301,9 @@ struct FloatingTimerView: View {
                 print("[Timer] After decrement - remainingSeconds:", remainingSeconds)
                 taskManager.updateTaskRemainingDuration(TimeInterval(remainingSeconds))
             } else {
-                print("[Timer] Timer reached zero - completing task")
-                timer.invalidate()
-                completeTask()
+                print("[Timer] Timer reached zero - stopping timer")
+                // timer.invalidate()
+                taskManager.toggleWorkingState() // Stop the timer but don't complete the task
             }
         }
         
