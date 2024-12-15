@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AppKit
 
 @main
 struct focusmodeApp: App {
@@ -16,6 +17,11 @@ struct focusmodeApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .onAppear {
+                    if let window = NSApplication.shared.windows.first {
+                        window.setContentSize(NSSize(width: 600, height: window.frame.height))
+                    }
+                }
         }
     }
 }
