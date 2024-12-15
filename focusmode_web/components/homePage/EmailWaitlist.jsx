@@ -14,6 +14,7 @@ export default function EmailWaitlist() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [validationError, setValidationError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,7 +38,9 @@ export default function EmailWaitlist() {
         setStatus("success");
         setEmail("");
       } else if (response.status === 400) {
-        setStatus("exists");
+        const data = await response.json();
+        setErrorMessage(data?.error);
+        setStatus("error");
       } else {
         setStatus("error");
       }
@@ -95,7 +98,7 @@ export default function EmailWaitlist() {
         )}
         {status === "error" && (
           <p className="text-red-600 text-sm">
-            Something went wrong. Please try again.
+            {errorMessage || "Something went wrong. Please try again."}
           </p>
         )}
       </form>
