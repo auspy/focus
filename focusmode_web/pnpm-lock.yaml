@@ -101,6 +101,9 @@ dependencies:
   jsencrypt:
     specifier: ^3.3.2
     version: 3.3.2
+  loops:
+    specifier: ^3.4.0
+    version: 3.4.0
   mongodb:
     specifier: ^6.5.0
     version: 6.12.0
@@ -4016,6 +4019,11 @@ packages:
 
   /longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
+    dev: false
+
+  /loops@3.4.0:
+    resolution: {integrity: sha512-5iseiVxG43tdNJPHdD6DdCZBnanIA+WWbu0/+q6e+smnFZaT57Gsw1quFtgFXqyRqW0GZzLRGlVaSiEik8QLJw==}
+    engines: {node: '>=18'}
     dev: false
 
   /loose-envify@1.4.0:

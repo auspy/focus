@@ -45,6 +45,7 @@
     "jquery": "^3.7.1",
     "js-tiktoken": "^1.0.14",
     "jsencrypt": "^3.3.2",
+    "loops": "^3.4.0",
     "mongodb": "^6.5.0",
     "next": "14.2.2",
     "next-themes": "^0.3.0",

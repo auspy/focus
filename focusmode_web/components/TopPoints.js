@@ -6,7 +6,7 @@ const TopPoint = ({ label }) => {
   }
   return (
     <div className="flex gap-1 items-center flex-row">
-      <div className="border-2 bg-lightRed border-red rounded-full relative p-1 h-3 w-3 ">
+      <div className="border-2 bg-lightRed border-primary rounded-full relative p-1 h-3 w-3 ">
         <Image
           style={{
             objectFit: "contain",

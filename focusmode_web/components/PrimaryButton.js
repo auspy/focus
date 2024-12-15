@@ -11,7 +11,7 @@ const PrimaryButton = ({ children, onClick, label, className, href }) => {
   );
 
   const buttonClass =
-    "bg-red px-[7vw] text-white font-semibold flex items-center gap-2 rounded-[5px] h-12 text-base " +
+    "bg-primary px-[7vw] text-white font-semibold flex items-center gap-2 rounded-[5px] h-12 text-base " +
     className;
 
   if (href) {

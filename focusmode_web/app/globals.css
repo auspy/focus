@@ -62,11 +62,11 @@
 @layer base {
   :root {
     --border: #e5e5e5;
-    --red: #ef2f2f;
+    --primary: #ef2f2f;
     --dark: #151515;
     --lightRed: #ffd8d8;
     --toastify-font-family: "Inter", sans-serif !important;
-    --toastify-color-error: var(--red) !important;
+    --toastify-color-error: var(--primary) !important;
   }
 }
 
@@ -164,7 +164,7 @@ a {
 a:hover {
   text-underline-offset: 2px;
   text-decoration: underline;
-  /* color: var(--red);
+  /* color: var(--primary);
   font-weight: 600; */
 }
 

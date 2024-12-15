@@ -10,13 +10,13 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Focus Mode | One Task at a Time",
+  title: "FocusMode | One Task at a Time",
   description:
     "A minimalist task timer designed for ADHD minds. Beat time blindness, stay focused, and get things done with a companion that understands your brain.",
   keywords:
     "ADHD, focus timer, task management, productivity, time blindness, ADHD app, focus mode, hyperactivity disorder",
   openGraph: {
-    title: "Focus Mode | One Task at a Time",
+    title: "FocusMode | One Task at a Time",
     description:
       "A minimalist task timer designed for ADHD minds. Beat time blindness, stay focused, and get things done.",
     type: "website",
@@ -32,7 +32,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Focus Mode | One Task at a Time",
+    title: "FocusMode | One Task at a Time",
     description:
       "A minimalist task timer designed for ADHD minds. Beat time blindness, stay focused, and get things done.",
     // images: ["/og-image.png"],
