@@ -9,7 +9,10 @@ interface Props {
   textColor?: string;
   className?: string;
   gradientPosition?: string;
+  height?: number;
+  width?: number;
 }
+
 export default function FeatureListItem({
   isImageLeft,
   imageUrl,
@@ -19,11 +22,15 @@ export default function FeatureListItem({
   textColor,
   className,
   gradientPosition,
+  height,
+  width,
 }: Props) {
   return (
     <>
       <div
-        className={` w-full mx-auto flex flex-col  ${isImageLeft ? "lg:flex-row" : "lg:flex-row-reverse"}  items-start gap-6 md:gap-10 `}
+        className={` w-full mx-auto flex flex-col  ${
+          isImageLeft ? "lg:flex-row" : "lg:flex-row-reverse"
+        }  items-start gap-6 md:gap-10 `}
       >
         <div className="w-full lg:w-1/2">
           <FeatureVideo
@@ -31,11 +38,15 @@ export default function FeatureListItem({
             className={className}
             src={imageUrl}
             title={imageAlt}
+            height={height}
+            width={width}
           />
         </div>
         <div className="w-full lg:w-1/2">
           <h2
-            className={`mb-4 md:mb-6 md:text-4xl  font-extrabold leading-[1.2]  ${textColor || "text-text"}`}
+            className={`mb-4 md:mb-6 md:text-4xl  font-extrabold leading-[1.2]  ${
+              textColor || "text-text"
+            }`}
           >
             {title}
           </h2>
