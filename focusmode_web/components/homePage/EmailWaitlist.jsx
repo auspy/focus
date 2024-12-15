@@ -37,11 +37,9 @@ export default function EmailWaitlist() {
       if (response.ok) {
         setStatus("success");
         setEmail("");
-      } else if (response.status === 400) {
+      } else {
         const data = await response.json();
         setErrorMessage(data?.error);
-        setStatus("error");
-      } else {
         setStatus("error");
       }
     } catch (error) {
