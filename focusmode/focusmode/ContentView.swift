@@ -11,12 +11,13 @@ struct ContentView: View {
     @StateObject private var taskManager = TaskManager.shared
     
     var body: some View {
-        VStack {
+        VStack(spacing: 8) {
             startButton
             TaskListView()
                 .opacity(taskManager.isWorking ? 0.6 : 1.0)
         }
-        .padding()
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
     }
     
     private var startButton: some View {
