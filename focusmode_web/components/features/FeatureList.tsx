@@ -24,7 +24,7 @@ export default function FeatureList() {
           </p>
         </>
       ),
-      imageUrl: "/follow.mov",
+      imageUrl: "/follow.mp4",
       imageAlt: "ADHD Focus Timer",
       imagePosition: "left",
       className: "object-center",
@@ -52,7 +52,7 @@ export default function FeatureList() {
           </p>
         </>
       ),
-      imageUrl: "/reorder.mov",
+      imageUrl: "/reorder.mp4",
       imageAlt: "ADHD Task Management",
       imagePosition: "right",
       textColor: "text-zinc-800",
@@ -82,7 +82,7 @@ export default function FeatureList() {
         </>
       ),
       className: "object-contain w-full",
-      imageUrl: "/track-progress.mov",
+      imageUrl: "/track-progress.mp4",
       imageAlt: "ADHD Progress Tracking",
       imagePosition: "left",
       textColor: "text-zinc-800",
