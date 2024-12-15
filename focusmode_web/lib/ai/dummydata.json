@@ -1,0 +1,31 @@
+{
+  "question": "What are some strategies to overcome the limitations of network calls in terms of scalability and data consistency?",
+  "answer": "To overcome the limitations of network calls in terms of scalability and data consistency, one strategy is to use a combination of vertical scaling and horizontal scaling. Vertical scaling involves buying a bigger machine to process requests faster, while horizontal scaling involves distributing requests among multiple machines to handle more traffic. Another strategy is to implement inter-process communication for faster communication between servers, instead of relying on slow network calls.",
+  "timestamp": [
+    [
+      {
+        "_id": "6628e93eb1bc6402abdea0de",
+        "start": 386.14,
+        "end": 387.46,
+        "video": {
+          "_id": "6628e93eb1bc6402abdea081",
+          "url": "https://youtube.com/watch?v=xpDnVSmNFX0"
+        }
+      },
+      {
+        "_id": "6628e93eb1bc6402abdea0d8",
+        "start": 354.66,
+        "end": 358.18,
+        "video": {
+          "_id": "6628e93eb1bc6402abdea081",
+          "url": "https://youtube.com/watch?v=xpDnVSmNFX0"
+        }
+      }
+    ]
+  ],
+  "followup_questions": [
+    "How does vertical scaling help in overcoming the limitations of network calls?",
+    "Can you provide examples of situations where horizontal scaling would be more beneficial than vertical scaling?",
+    "What are the potential drawbacks of relying solely on inter-process communication for communication between servers?"
+  ]
+}

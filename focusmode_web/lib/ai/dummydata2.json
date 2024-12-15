@@ -1,0 +1,46 @@
+{
+  "question": "what are distributed systems in simple terms and how to prevent single point of failure",
+  "answer": "Distributed systems are systems where multiple components work together across different locations to achieve a common goal. To prevent single points of failure in a system, redundancy can be added by introducing more nodes or regions, replicating data, and ensuring fault-tolerance.",
+  "followup_questions": [
+    "How do regions and multiple regions help prevent single points of failure in a system?",
+    "Can you explain the concept of fault-tolerance in the context of distributed systems?",
+    "What are the challenges associated with adding redundancy to a system to prevent single points of failure?"
+  ],
+  "timestamp": [
+    [
+      {
+        "_id": {
+          "$oid": "6628f4320d7b2f6226ad00db"
+        },
+        "start": 0.24,
+        "end": 4.72,
+        "video": {
+          "_id": "6628f4320d7b2f6226ad00da",
+          "url": "https://youtube.com/watch?v=-BOysyYErLY"
+        }
+      },
+      {
+        "_id": {
+          "$oid": "6628f4320d7b2f6226ad0107"
+        },
+        "start": 253.54,
+        "end": 260.14,
+        "video": {
+          "_id": "6628f4320d7b2f6226ad00da",
+          "url": "https://youtube.com/watch?v=-BOysyYErLY"
+        }
+      },
+      {
+        "_id": {
+          "$oid": "6628f4320d7b2f6226ad00f8"
+        },
+        "start": 156.62,
+        "end": 164.38,
+        "video": {
+          "_id": "6628f4320d7b2f6226ad00da",
+          "url": "https://youtube.com/watch?v=-BOysyYErLY"
+        }
+      }
+    ]
+  ]
+}

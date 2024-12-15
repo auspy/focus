@@ -1,0 +1,74 @@
+{
+  "_id": {
+    "$oid": "666aa4400169f78465bbaaff"
+  },
+  "matches": [
+    {
+      "id": "ac1f4195-9c48-4102-91d6-4dbb6929849f",
+      "score": 0.580132663,
+      "values": [],
+      "sparseValues": null,
+      "metadata": {
+        "text": "You can pull it and try to apply everything. You should work on your Kubernetes cluster as well. The last thing I have to do is expose this.",
+        "videoId": "666a3947f4518e92afee65a8"
+      }
+    },
+    {
+      "id": "39785eb6-a77e-48dd-a7a1-8b83d8f19503",
+      "score": 0.560119689,
+      "values": [],
+      "sparseValues": null,
+      "metadata": {
+        "text": "So on and so forth. Now the question how do I inject these as environment variables in my Kubernetes cluster? In my Kubernetes pod that I'm starting. What pod do I need to start? What image does that pod need to run? It needs to run this image right? 100xdev slash ENV backend. The one that I was running locally. Now I want to run inside Kubernetes. I was running it inside Docker before. Now I want to run in my Kubernetes cluster. So how can I do that? I will have to create either a deployment. Or a pod doesn't matter. You can choose either. Let's create a deployment. Let's see if we have one here. We do this deployment is sort of important. Even though it looks very big, it's actually not that big. It says create a deployment where was deployment introduced in the apps slash V1 version of Kubernetes. This is the name of my deployment. It should start one pod finally. I can of course increase this to two, three whatever.",
+        "videoId": "666a3947f4518e92afee65a8"
+      }
+    },
+    {
+      "id": "e5452f63-0615-47d2-a164-04e5fc3b3d2a",
+      "score": 0.556824565,
+      "values": [],
+      "sparseValues": null,
+      "metadata": {
+        "text": "But while I was building it, I did something extra. I gave dash dash platform Linux slash AMD 64 because this will eventually be running not in a mac machine. But a Linux based on one-to-machine on Walter and hence I had to change this platform. Then I pushed this. I pushed this to 100x dash slash ENV backend. Now I have my Docker image somewhere. I can use it to run it locally using Docker or I can use it to run it in my Kubernetes cluster. How can I run it in my Kubernetes cluster? I have to create a deployment. I have to create a deployment. Which says, here you are a deployment. This is your name. You're going to have one replica, one copy. This is how you match the pods that you are creating. This is your pod. This is how you know that you own them.",
+        "videoId": "666a3947f4518e92afee65a8"
+      }
+    }
+  ],
+  "namespace": "",
+  "usage": {
+    "readUnits": 6
+  },
+  "question": "how can i implement kubernetes",
+  "created_at": {
+    "$date": "2024-06-13T07:48:11.152Z"
+  },
+  "timestamp": [
+    [
+      {
+        "_id": "666a3947f4518e92afee6765",
+        "start": 3101.1,
+        "end": 3108.44,
+        "video": {
+          "_id": "666a3947f4518e92afee65a8",
+          "url": "https://appxcontent.b-cdn.net/uploadvideo2/2024-06-11/harkirat_db/2024-06-11-0.31182590156456125.mp4"
+        }
+      },
+      {
+        "_id": "666a3947f4518e92afee6771",
+        "start": 3180.06,
+        "end": 3186,
+        "video": {
+          "_id": "666a3947f4518e92afee65a8",
+          "url": "https://appxcontent.b-cdn.net/uploadvideo2/2024-06-11/harkirat_db/2024-06-11-0.31182590156456125.mp4"
+        }
+      }
+    ]
+  ],
+  "answer": "To implement Kubernetes, you need to create a deployment or a pod in your Kubernetes cluster. You can run your Docker image in Kubernetes by creating a deployment with the desired configuration.",
+  "timeTaken": 8502,
+  "followup_questions": [
+    "What are the key differences between creating a deployment and a pod in Kubernetes?",
+    "How can environment variables be injected into Kubernetes pods?",
+    "What are the advantages of running Docker images in a Kubernetes cluster compared to running them locally?"
+  ]
+}
