@@ -3,13 +3,12 @@ import FeatureListItem from "./FeatureListItem";
 export default function FeatureList() {
   const data = [
     {
-      title: "Focus Mode Timer: Built for ADHD Minds",
+      title: "Always visible without getting in the way",
       description: (
         <>
           <p>
-            Living with ADHD means time can slip through your fingers like
-            water. Our floating focus timer was specifically designed for people
-            with ADHD symptoms who struggle with time blindness.
+            Our floating focus timer was specifically designed for people with
+            ADHD symptoms who struggle with time blindness.
           </p>
           <p>
             Unlike traditional timers that get buried under windows, our
@@ -17,10 +16,9 @@ export default function FeatureList() {
             ADHD attention patterns, keeping you connected to reality without
             adding to the noise.
           </p>
-          <p>
-            Our users report saving 8-10 hours weekly by staying in focus mode,
-            finally breaking free from the cycle of time blindness that comes
-            with hyperactivity disorder.
+          <p className="italic opacity-70">
+            Users save 8-10 hours weekly by staying focused and breaking free
+            from time blindness.
           </p>
         </>
       ),
@@ -31,24 +29,22 @@ export default function FeatureList() {
       textColor: "text-zinc-800",
     },
     {
-      title: "Smart Task Management: Break Free from Procrastination",
+      title: "One thing. That's it. No overwhelm.",
       description: (
         <>
           <p>
-            With ADHD, starting tasks feels like pushing a boulder uphill. Our
-            smart task system breaks through this barrier by showing you just
-            one task at a time – the only one your ADHD brain needs to focus on
-            right now.
+            Our smart task system breaks through the barrier of distractions by
+            showing you just one task at a time – the only one your ADHD brain
+            needs to focus on right now.
           </p>
           <p>
             Unlike standard todo apps that bombard you with endless lists, our
             system gently guides you through your day, working in harmony with
             your natural attention patterns.
           </p>
-          <p>
-            Our users with hyperactivity disorder report completing 70% more
-            tasks when they can focus on one thing at a time. Transform
-            overwhelming projects into manageable steps.
+          <p className="italic opacity-70">
+            Users report completing 70% more tasks with our single-focus
+            approach, breaking down complex projects into simple steps.
           </p>
         </>
       ),
@@ -60,24 +56,22 @@ export default function FeatureList() {
       gradientPosition: "top-0 left-0 ",
     },
     {
-      title: "Visual Progress Tracking: Celebrate Every ADHD Victory",
+      title: "Watch your progress grow with calm animations",
       description: (
         <>
           <p>
-            When you have ADHD, maintaining motivation feels like trying to fill
-            a leaky bucket. Our visual celebration system turns every completed
-            task into a moment of triumph, feeding your brain's need for
-            immediate rewards.
+            Keep track of your progress with gentle, unobtrusive animations that
+            flow naturally in the background. Our subtle visual feedback stays
+            out of your way while you work.
           </p>
           <p>
-            Understanding ADHD symptoms means knowing the power of visible
-            progress. Watch as your focus sessions stack up into beautiful
-            achievement streaks with satisfying animations.
+            Watch your focus sessions grow quietly with soothing animations that
+            never distract. The calm visuals help you stay aware of your
+            progress without breaking your flow.
           </p>
-          <p>
-            Users with hyperactivity disorder report feeling 3x more motivated
-            with our reward system. Transform your relationship with tasks from
-            dread to excitement.
+          <p className="italic opacity-70">
+            Users report 3x higher motivation with our visual feedback system,
+            turning challenging tasks into rewarding accomplishments.
           </p>
         </>
       ),
