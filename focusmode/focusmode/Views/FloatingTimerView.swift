@@ -297,12 +297,13 @@ struct FloatingTimerView: View {
             Button("Complete Task") {
                 completeTask()
             }
-            Button("Start Again") {
+            Button("Restart Timer") {
                 // Reset timer to initial duration and start
                 remainingSeconds = totalDuration
                 startTimeSeconds = remainingSeconds
                 taskManager.updateTaskRemainingDuration(TimeInterval(remainingSeconds))
                 taskManager.toggleWorkingState()
+                startTimer() // Actually start the timer after resetting values
             }
             Button("Cancel", role: .cancel) { }
         } message: {
