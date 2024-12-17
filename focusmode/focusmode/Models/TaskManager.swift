@@ -32,8 +32,8 @@ class TaskManager: ObservableObject {
         repository.updateTaskOrder(tasks: tasks)
     }
     
-    func addTask(title: String, duration: TimeInterval) {
-        let task = Task(title: title, duration: duration)
+    func addTask(title: String, duration: TimeInterval, timingMode: TimingMode = .timer) {
+        let task = Task(title: title, duration: duration, timingMode: timingMode)
         if !tasks.contains(where: { $0.id == task.id }) {
             tasks.append(task)
             repository.saveTask(task)
@@ -56,9 +56,16 @@ class TaskManager: ObservableObject {
         guard let currentTaskId = currentTask?.id,
               let index = tasks.firstIndex(where: { $0.id == currentTaskId }) else { return }
         
-        tasks[index].remainingDuration = duration
-        currentTask = tasks[index]
-        repository.updateTaskRemainingDuration(id: currentTaskId, duration: duration)
+        if tasks[index].timingMode == .timer {
+            tasks[index].remainingDuration = duration
+            currentTask = tasks[index]
+            repository.updateTaskRemainingDuration(id: currentTaskId, duration: duration)
+        } else {
+            // For stopwatch, update elapsed time
+            tasks[index].updateElapsedTime(duration)
+            currentTask = tasks[index]
+            repository.updateTaskElapsedTime(id: currentTaskId, elapsedTime: duration)
+        }
     }
     
     func toggleWorkingState() {
@@ -87,6 +94,12 @@ class TaskManager: ObservableObject {
     func startTask(_ task: Task) {
         var updatedTask = task
         updatedTask.status = .inProgress
+        
+        // For stopwatch tasks, ensure we're using the correct elapsed time
+        if updatedTask.timingMode == .stopwatch {
+            updatedTask.remainingDuration = nil
+        }
+        
         currentTask = updatedTask
         isWorking = true
         

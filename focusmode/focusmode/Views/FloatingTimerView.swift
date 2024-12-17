@@ -50,29 +50,49 @@ private struct ControlButtons: View {
     let completeTask: () -> Void
     let timerDisplay: String
     
+    private var isPlayPauseDisabled: Bool {
+        guard let currentTask = taskManager.currentTask else { return true }
+        
+        if currentTask.timingMode == .stopwatch {
+            return false // Never disable for stopwatch mode
+        }
+        
+        // For timer mode, check remaining duration
+        return taskManager.tasks.isEmpty || 
+               currentTask.title == "No Task" || 
+               currentTask.remainingDuration == nil || 
+               (currentTask.remainingDuration ?? 0) <= 0
+    }
+    
+    private var isStopwatchMode: Bool {
+        taskManager.currentTask?.timingMode == .stopwatch
+    }
+    
     var body: some View {
         HStack(spacing: 8) {
-            // +5 button
-            Button(action: {
-                taskManager.addTime(minutes: 5)
-            }) {
-                HStack(spacing: 2) {
-                    Text("+5m")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(AppColors.background)
-                        .padding(.horizontal, 2)
-                        .padding(.vertical, 1)
-                        .background(.primary)
-                        .cornerRadius(4)
-                        .fixedSize()
+            // +5 button - only show for timer mode
+            if !isStopwatchMode {
+                Button(action: {
+                    taskManager.addTime(minutes: 5)
+                }) {
+                    HStack(spacing: 2) {
+                        Text("+5m")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(AppColors.background)
+                            .padding(.horizontal, 2)
+                            .padding(.vertical, 1)
+                            .background(.primary)
+                            .cornerRadius(4)
+                            .fixedSize()
+                    }
                 }
-            }
-            .buttonStyle(PlainButtonStyle())
-            .onHover { isHovered in
-                if isHovered {
-                    NSCursor.pointingHand.push()
-                } else {
-                    NSCursor.pop()
+                .buttonStyle(PlainButtonStyle())
+                .onHover { isHovered in
+                    if isHovered {
+                        NSCursor.pointingHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
                 }
             }
             
@@ -81,7 +101,6 @@ private struct ControlButtons: View {
                 .monospacedDigit()
                 .fixedSize()
             
-          
             // Tick button
             Button(action: completeTask) {
                 Image(systemName: "checkmark.circle.fill")
@@ -96,7 +115,7 @@ private struct ControlButtons: View {
                 }
             }
 
-              // Play/Pause button
+            // Play/Pause button
             Button(action: {
                 taskManager.toggleWorkingState()
             }) {
@@ -104,7 +123,7 @@ private struct ControlButtons: View {
                     .foregroundColor(.primary)
             }
             .buttonStyle(PlainButtonStyle())
-            .disabled(taskManager.tasks.isEmpty || taskManager.currentTask == nil || taskManager.currentTask?.title == nil || taskManager.currentTask?.title == "No Task" || taskManager.currentTask?.remainingDuration == nil || (taskManager.currentTask?.remainingDuration ?? 0) <= 0)
+            .disabled(isPlayPauseDisabled)
             .onHover { isHovered in
                 if isHovered {
                     NSCursor.pointingHand.push()
@@ -155,12 +174,157 @@ struct FloatingTimerView: View {
     @State private var showCelebration = false
     @State private var isTimerPaused = false
     @State private var showZeroTimeAlert = false
-    @State private var overtimeSeconds: Int = 0  // Track overtime duration
+    @State private var overtimeSeconds: Int = 0
+    @State private var stopwatchSeconds: Int = 0
     
     // Constants for customization
-    private let progressColor = Color(hex: "#007AFF") // Apple's default blue
-    private let overtimeColor = Color.orange  // Color for overtime progress
+    private let progressColor = Color(hex: "#007AFF")
+    private let overtimeColor = Color.orange
+    private let stopwatchColor = Color(hex: "#007AFF")
     private let initialSeconds: Int
+    
+    private var isStopwatchMode: Bool {
+        currentTask?.timingMode == .stopwatch
+    }
+    
+    // Update progress color logic
+    private var currentProgressColor: Color {
+        if isStopwatchMode {
+            return stopwatchColor
+        }
+        if remainingSeconds <= 0 {
+            return overtimeColor
+        }
+        if progress > 0.9 {
+            return .red
+        }
+        return progressColor
+    }
+    
+    // Update progress calculation
+    private var progress: CGFloat {
+        guard currentTask != nil else { return 0 }
+        
+        if isStopwatchMode {
+            return 1.0 // Always show full progress for stopwatch
+        }
+        
+        if remainingSeconds <= 0 {
+            return 1.0
+        }
+        
+        let totalDuration = TimeInterval(totalDuration)
+        let remainingDuration = TimeInterval(remainingSeconds)
+        return 1 - (CGFloat(remainingDuration) / CGFloat(totalDuration))
+    }
+    
+    // Update timer display
+    private var timerDisplay: String {
+        if isStopwatchMode {
+            let hours = stopwatchSeconds / 3600
+            let minutes = (stopwatchSeconds % 3600) / 60
+            let seconds = stopwatchSeconds % 60
+            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        }
+        
+        if remainingSeconds > 0 {
+            let hours = remainingSeconds / 3600
+            let minutes = (remainingSeconds % 3600) / 60
+            let seconds = remainingSeconds % 60
+            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            let totalOvertime = overtimeSeconds
+            let hours = totalOvertime / 3600
+            let minutes = (totalOvertime % 3600) / 60
+            let seconds = totalOvertime % 60
+            return String(format: "+%02d:%02d:%02d", hours, minutes, seconds)
+        }
+    }
+    
+    // Update startTimer function
+    private func startTimer() {
+        // Reset counters based on mode
+        if isStopwatchMode {
+            // Don't reset stopwatch seconds if we're resuming
+            if stopwatchSeconds == 0 {
+                stopwatchSeconds = Int(currentTask?.elapsedTime ?? 0)
+            }
+        } else {
+            overtimeSeconds = 0
+        }
+        
+        // Cleanup existing timer and observers
+        timerState.cleanup()
+        
+        // Create and retain new timer
+        timerState.timerInstance = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            guard self.taskManager.isWorking else {
+                print("[Timer] Skipped update - task not working")
+                return
+            }
+            
+            if self.isStopwatchMode {
+                self.stopwatchSeconds += 1
+                print("[Stopwatch] Seconds:", self.stopwatchSeconds)
+                // Update the task's elapsed time in the repository
+                self.taskManager.updateTaskRemainingDuration(TimeInterval(self.stopwatchSeconds))
+            } else {
+                if self.remainingSeconds > 0 {
+                    self.remainingSeconds -= 1
+                    print("[Timer] After decrement - remainingSeconds:", self.remainingSeconds)
+                    self.taskManager.updateTaskRemainingDuration(TimeInterval(self.remainingSeconds))
+                } else {
+                    self.overtimeSeconds += 1
+                    print("[Timer] Overtime - seconds:", self.overtimeSeconds)
+                }
+            }
+        }
+        
+        // Listen for task switches
+        timerState.taskSwitchToken = NotificationCenter.default.addObserver(
+            forName: .taskSwitched,
+            object: nil,
+            queue: .main
+        ) { [self] notification in
+            guard let userInfo = notification.userInfo,
+                  let newTask = userInfo["newTask"] as? Task,
+                  !showCelebration else {
+                print("[TaskSwitch] Switch ignored - celebration showing or invalid data")
+                return
+            }
+            
+            print("[TaskSwitch] Updating remainingSeconds from:", remainingSeconds)
+            remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
+            print("[TaskSwitch] Updated remainingSeconds to:", remainingSeconds)
+            startTimeSeconds = remainingSeconds
+            totalDuration = Int(newTask.duration)
+        }
+        
+        // Listen for all tasks completed
+        timerState.tasksCompletedToken = NotificationCenter.default.addObserver(
+            forName: .allTasksCompleted,
+            object: nil,
+            queue: .main
+        ) { [self] _ in
+            // Only reset timer if this is actually the current task being completed
+            guard taskManager.tasks.isEmpty && currentTask == nil else { return }
+            remainingSeconds = 0
+        }
+        
+        // Listen for time additions
+        timerState.timeAddedToken = NotificationCenter.default.addObserver(
+            forName: .taskTimeAdded,
+            object: nil,
+            queue: .main
+        ) { [self] notification in
+            guard let userInfo = notification.userInfo,
+                  let addedSeconds = userInfo["addedSeconds"] as? TimeInterval,
+                  !showCelebration else { return }
+            
+            remainingSeconds += Int(addedSeconds)
+            totalDuration += Int(addedSeconds)
+        }
+    }
     
     // Computed property to get current task
     private var currentTask: Task? {
@@ -172,54 +336,25 @@ struct FloatingTimerView: View {
         taskManager.tasks.isEmpty && currentTask == nil
     }
     
-    // Add computed property for progress color
-    private var currentProgressColor: Color {
-        if remainingSeconds <= 0 {
-            return overtimeColor
-        }
-        // If less than 10% time remaining, show red
-        if progress > 0.9 {
-            return .red
-        }
-        return progressColor
-    }
-    
     init(task: Task, progressStyle: Binding<ProgressStyle>) {
-        self.taskManager = TaskManager.shared  // Initialize taskManager
+        self.taskManager = TaskManager.shared
         self._progressStyle = progressStyle
-        let seconds = Int(task.remainingDuration ?? task.duration)
-        print("[Init] Initial seconds set to:", seconds)
-        _remainingSeconds = State(initialValue: seconds)
-        _startTimeSeconds = State(initialValue: seconds)
-        _totalDuration = State(initialValue: Int(task.duration))
-        self.initialSeconds = Int(task.duration)
-    }
-    
-    private var timerDisplay: String {
-        if remainingSeconds > 0 {
-            let hours = remainingSeconds / 3600
-            let minutes = (remainingSeconds % 3600) / 60
-            let seconds = remainingSeconds % 60
-            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        
+        // Initialize based on timing mode
+        if task.timingMode == .stopwatch {
+            _stopwatchSeconds = State(initialValue: Int(task.elapsedTime))
+            _remainingSeconds = State(initialValue: 0)
+            _startTimeSeconds = State(initialValue: 0)
+            _totalDuration = State(initialValue: Int(task.duration))
         } else {
-            // Display overtime with a "+" prefix
-            let totalOvertime = overtimeSeconds
-            let hours = totalOvertime / 3600
-            let minutes = (totalOvertime % 3600) / 60
-            let seconds = totalOvertime % 60
-            return String(format: "+%02d:%02d:%02d", hours, minutes, seconds)
+            let seconds = Int(task.remainingDuration ?? task.duration)
+            _remainingSeconds = State(initialValue: seconds)
+            _startTimeSeconds = State(initialValue: seconds)
+            _totalDuration = State(initialValue: Int(task.duration))
+            _stopwatchSeconds = State(initialValue: 0)
         }
-    }
-    
-    private var progress: CGFloat {
-        guard let task = currentTask else { return 0 }
-        if remainingSeconds <= 0 {
-            // Show full progress bar during overtime
-            return 1.0
-        }
-        let totalDuration = TimeInterval(totalDuration)
-        let remainingDuration = TimeInterval(remainingSeconds)
-        return 1 - (CGFloat(remainingDuration) / CGFloat(totalDuration))
+        
+        self.initialSeconds = Int(task.duration)
     }
     
     @ViewBuilder
@@ -351,78 +486,6 @@ struct FloatingTimerView: View {
             if !newTasks.isEmpty {
                 showCelebration = false
             }
-        }
-    }
-    
-    private func startTimer() {
-        // Reset overtime when starting timer
-        overtimeSeconds = 0
-        
-        // Cleanup existing timer and observers
-        timerState.cleanup()
-        
-        // Create and retain new timer
-        timerState.timerInstance = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            // Only update if task is in working state
-            guard self.taskManager.isWorking else {
-                print("[Timer] Skipped update - task not working")
-                return
-            }
-            
-            if self.remainingSeconds > 0 {
-                self.remainingSeconds -= 1
-                print("[Timer] After decrement - remainingSeconds:", self.remainingSeconds)
-                self.taskManager.updateTaskRemainingDuration(TimeInterval(self.remainingSeconds))
-            } else {
-                // Instead of stopping, increment overtime
-                self.overtimeSeconds += 1
-                print("[Timer] Overtime - seconds:", self.overtimeSeconds)
-            }
-        }
-        
-        // Listen for task switches
-        timerState.taskSwitchToken = NotificationCenter.default.addObserver(
-            forName: .taskSwitched,
-            object: nil,
-            queue: .main
-        ) { [self] notification in
-            guard let userInfo = notification.userInfo,
-                  let newTask = userInfo["newTask"] as? Task,
-                  !showCelebration else {
-                print("[TaskSwitch] Switch ignored - celebration showing or invalid data")
-                return
-            }
-            
-            print("[TaskSwitch] Updating remainingSeconds from:", remainingSeconds)
-            remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
-            print("[TaskSwitch] Updated remainingSeconds to:", remainingSeconds)
-            startTimeSeconds = remainingSeconds
-            totalDuration = Int(newTask.duration)
-        }
-        
-        // Listen for all tasks completed
-        timerState.tasksCompletedToken = NotificationCenter.default.addObserver(
-            forName: .allTasksCompleted,
-            object: nil,
-            queue: .main
-        ) { [self] _ in
-            // Only reset timer if this is actually the current task being completed
-            guard taskManager.tasks.isEmpty && currentTask == nil else { return }
-            remainingSeconds = 0
-        }
-        
-        // Listen for time additions
-        timerState.timeAddedToken = NotificationCenter.default.addObserver(
-            forName: .taskTimeAdded,
-            object: nil,
-            queue: .main
-        ) { [self] notification in
-            guard let userInfo = notification.userInfo,
-                  let addedSeconds = userInfo["addedSeconds"] as? TimeInterval,
-                  !showCelebration else { return }
-            
-            remainingSeconds += Int(addedSeconds)
-            totalDuration += Int(addedSeconds)
         }
     }
     

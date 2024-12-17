@@ -142,12 +142,44 @@ struct PresetButton: View {
     }
 }
 
+// Add TimingModeSelector view
+struct TimingModeSelector: View {
+    @Binding var selectedMode: TimingMode
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Mode:")
+                .foregroundColor(AppColors.secondaryText)
+                .font(.system(size: 13))
+            
+            HStack(spacing: 8) {
+                ForEach([TimingMode.timer, TimingMode.stopwatch], id: \.self) { mode in
+                    Button(action: {
+                        selectedMode = mode
+                    }) {
+                        HStack {
+                            Image(systemName: mode == .timer ? "timer" : "stopwatch")
+                            Text(mode == .timer ? "Timer" : "Stopwatch")
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(selectedMode == mode ? AppColors.primary.opacity(0.2) : Color.clear)
+                        .cornerRadius(8)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+}
+
 struct AddTaskView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @State private var title = ""
     @State private var hours: Int = 0
     @State private var minutes: Int = 25
+    @State private var selectedMode: TimingMode = .timer
     let commonDurations = [
         // Short durations
         DurationPreset(hours: 0, minutes: 5),    
@@ -162,7 +194,7 @@ struct AddTaskView: View {
         DurationPreset(hours: 3, minutes: 0),    
         DurationPreset(hours: 4, minutes: 0)     
     ]
-    let onAdd: (String, TimeInterval) -> Void
+    let onAdd: (String, TimeInterval, TimingMode) -> Void
     
     private var totalMinutes: Double {
         Double(hours * 60 + minutes)
@@ -172,36 +204,41 @@ struct AddTaskView: View {
         VStack(alignment: .leading, spacing: 16) {
             TimePreviewView(duration: totalMinutes)
                 .frame(maxWidth: .infinity)
-                
-                TaskInputSection(title: $title)
-                
+                .opacity(selectedMode == .timer ? 1 : 0.5)
+            
+            TaskInputSection(title: $title)
+            
+            TimingModeSelector(selectedMode: $selectedMode)
+            
+            if selectedMode == .timer {
                 DurationSection(
                     hours: $hours,
                     minutes: $minutes,
                     commonDurations: commonDurations
                 )
-                
-                HStack {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .buttonStyle(.borderless)
-                    
-                    Spacer()
-                    
-                    Button("Save") {
-                        onAdd(title, totalMinutes * 60)
-                        dismiss()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(AppColors.primary)
-                    .disabled(title.isEmpty || totalMinutes == 0)
-                }
-                .padding(.top, 8)
             }
-            .padding(16)
-            .frame(width: 300)
-            .background(AppColors.background)
+            
+            HStack {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .buttonStyle(.borderless)
+                
+                Spacer()
+                
+                Button("Save") {
+                    onAdd(title, totalMinutes * 60, selectedMode)
+                    dismiss()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(AppColors.primary)
+                .disabled(title.isEmpty || (selectedMode == .timer && totalMinutes == 0))
+            }
+            .padding(.top, 8)
+        }
+        .padding(16)
+        .frame(width: 300)
+        .background(AppColors.background)
         .frame(width: 300)
         .onChange(of: hours) { oldValue, newValue in
             if newValue < 0 { hours = 0 }

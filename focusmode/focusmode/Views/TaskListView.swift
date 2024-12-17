@@ -39,8 +39,8 @@ struct TaskListView: View {
             }
         }
         .sheet(isPresented: $isAddingTask) {
-            AddTaskView { title, duration in
-                taskManager.addTask(title: title, duration: duration)
+            AddTaskView { title, duration, timingMode in
+                taskManager.addTask(title: title, duration: duration, timingMode: timingMode)
             }
         }
     }
@@ -61,7 +61,7 @@ struct TaskRow: View {
             VStack(alignment: .leading) {
                 Text(task.title)
                     .font(.headline)
-                Text(formatTime(task.remainingDuration ?? task.duration))
+                Text(getTimeDisplay())
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -85,7 +85,16 @@ struct TaskRow: View {
         .opacity(isCurrentTask ? 1.0 : 0.6)
     }
     
-    private func formatTime(_ timeInterval: TimeInterval) -> String {
+    private func getTimeDisplay() -> String {
+        if task.timingMode == .stopwatch {
+            let totalTime = task.duration - (task.remainingDuration ?? task.duration)
+            return formatTimeForStopwatch(totalTime)
+        } else {
+            return formatTimeForTimer(task.remainingDuration ?? task.duration)
+        }
+    }
+    
+    private func formatTimeForTimer(_ timeInterval: TimeInterval) -> String {
         let hours = Int(timeInterval) / 3600
         let minutes = (Int(timeInterval) % 3600) / 60
         let seconds = Int(timeInterval) % 60
@@ -96,6 +105,21 @@ struct TaskRow: View {
             return String(format: "%d:%02d remaining", minutes, seconds)
         } else {
             return "\(seconds)s remaining"
+        }
+    }
+    
+    private func formatTimeForStopwatch(_ timeInterval: TimeInterval) -> String {
+        return "stopwatch"
+        let hours = Int(timeInterval) / 3600
+        let minutes = (Int(timeInterval) % 3600) / 60
+        let seconds = Int(timeInterval) % 60
+        
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d elapsed", hours, minutes, seconds)
+        } else if minutes > 0 {
+            return String(format: "%d:%02d elapsed", minutes, seconds)
+        } else {
+            return "\(seconds)s elapsed"
         }
     }
 } 

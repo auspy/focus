@@ -7,6 +7,7 @@ protocol TaskRepository {
     func deleteTask(id: String)
     func updateTaskOrder(tasks: [Task])
     func updateTaskRemainingDuration(id: String, duration: TimeInterval)
+    func updateTaskElapsedTime(id: String, elapsedTime: TimeInterval)
     func getTask(by id: String) -> Task?
 }
 
@@ -116,6 +117,23 @@ class CoreDataTaskRepository: TaskRepository {
         }
     }
     
+    // MARK: - Update Elapsed Time
+    func updateTaskElapsedTime(id: String, elapsedTime: TimeInterval) {
+        let request = NSFetchRequest<TaskEntity>(entityName: "TaskEntity")
+        request.predicate = NSPredicate(format: "id == %@", id)
+        
+        do {
+            let results = try context.fetch(request)
+            if let entity = results.first {
+                entity.duration = elapsedTime  // For stopwatch, duration is elapsed time
+                entity.remainingDuration = 0.0 // Instead of nil, use 0.0 for stopwatch
+                try context.save()
+            }
+        } catch {
+            print("Error updating elapsed time: \(error)")
+        }
+    }
+    
     // MARK: - Get Task by ID
     func getTask(by id: String) -> Task? {
         let request = NSFetchRequest<TaskEntity>(entityName: "TaskEntity")
@@ -135,10 +153,16 @@ class CoreDataTaskRepository: TaskRepository {
         var task = Task(
             id: entity.id ?? UUID().uuidString,
             title: entity.title ?? "",
-            duration: entity.duration
+            duration: entity.duration,
+            status: TaskStatus(rawValue: entity.status ?? "") ?? .notStarted,
+            timingMode: TimingMode(rawValue: entity.timingMode ?? "timer") ?? .timer,
+            elapsedTime: entity.timingMode == "stopwatch" ? entity.duration : 0
         )
-        task.remainingDuration = entity.remainingDuration
-        task.status = TaskStatus(rawValue: entity.status ?? "") ?? .notStarted
+        
+        // Only set remainingDuration for timer mode
+        if entity.timingMode == "timer" {
+            task.remainingDuration = entity.remainingDuration ?? entity.duration
+        }
         task.completedAt = entity.completedAt
         return task
     }
@@ -147,10 +171,14 @@ class CoreDataTaskRepository: TaskRepository {
         entity.id = task.id
         entity.title = task.title
         entity.duration = task.duration
-        entity.remainingDuration = task.remainingDuration ?? task.duration
+        // Only set remainingDuration if it exists
+        if let remainingDuration = task.remainingDuration {
+            entity.remainingDuration = remainingDuration
+        }
         entity.status = task.status.rawValue
         entity.completedAt = task.completedAt
         entity.createdAt = Date()
+        entity.timingMode = task.timingMode.rawValue
         
         // Get the highest order index and add 1
         let request = NSFetchRequest<TaskEntity>(entityName: "TaskEntity")
