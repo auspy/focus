@@ -155,9 +155,11 @@ struct FloatingTimerView: View {
     @State private var showCelebration = false
     @State private var isTimerPaused = false
     @State private var showZeroTimeAlert = false
+    @State private var overtimeSeconds: Int = 0  // Track overtime duration
     
     // Constants for customization
     private let progressColor = Color(hex: "#007AFF") // Apple's default blue
+    private let overtimeColor = Color.orange  // Color for overtime progress
     private let initialSeconds: Int
     
     // Computed property to get current task
@@ -172,6 +174,9 @@ struct FloatingTimerView: View {
     
     // Add computed property for progress color
     private var currentProgressColor: Color {
+        if remainingSeconds <= 0 {
+            return overtimeColor
+        }
         // If less than 10% time remaining, show red
         if progress > 0.9 {
             return .red
@@ -191,18 +196,27 @@ struct FloatingTimerView: View {
     }
     
     private var timerDisplay: String {
-        let hours = remainingSeconds / 3600
-        let minutes = (remainingSeconds % 3600) / 60
-        let seconds = remainingSeconds % 60
-        
-        print("[TimerDisplay] Current time breakdown - Hours:", hours, "Minutes:", minutes, "Seconds:", seconds)
-        print("[TimerDisplay] Total remaining seconds:", remainingSeconds)
-        
-        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        if remainingSeconds > 0 {
+            let hours = remainingSeconds / 3600
+            let minutes = (remainingSeconds % 3600) / 60
+            let seconds = remainingSeconds % 60
+            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            // Display overtime with a "+" prefix
+            let totalOvertime = overtimeSeconds
+            let hours = totalOvertime / 3600
+            let minutes = (totalOvertime % 3600) / 60
+            let seconds = totalOvertime % 60
+            return String(format: "+%02d:%02d:%02d", hours, minutes, seconds)
+        }
     }
     
     private var progress: CGFloat {
         guard let task = currentTask else { return 0 }
+        if remainingSeconds <= 0 {
+            // Show full progress bar during overtime
+            return 1.0
+        }
         let totalDuration = TimeInterval(totalDuration)
         let remainingDuration = TimeInterval(remainingSeconds)
         return 1 - (CGFloat(remainingDuration) / CGFloat(totalDuration))
@@ -341,11 +355,8 @@ struct FloatingTimerView: View {
     }
     
     private func startTimer() {
-        // If time is zero, show confirmation dialog
-        if remainingSeconds == 0 {
-            showZeroTimeAlert = true
-            return
-        }
+        // Reset overtime when starting timer
+        overtimeSeconds = 0
         
         // Cleanup existing timer and observers
         timerState.cleanup()
@@ -358,14 +369,14 @@ struct FloatingTimerView: View {
                 return
             }
             
-            print("[Timer] Before update - remainingSeconds:", self.remainingSeconds)
             if self.remainingSeconds > 0 {
                 self.remainingSeconds -= 1
                 print("[Timer] After decrement - remainingSeconds:", self.remainingSeconds)
                 self.taskManager.updateTaskRemainingDuration(TimeInterval(self.remainingSeconds))
             } else {
-                print("[Timer] Timer reached zero - stopping timer")
-                self.taskManager.toggleWorkingState() // Stop the timer but don't complete the task
+                // Instead of stopping, increment overtime
+                self.overtimeSeconds += 1
+                print("[Timer] Overtime - seconds:", self.overtimeSeconds)
             }
         }
         
