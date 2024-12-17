@@ -154,6 +154,7 @@ struct FloatingTimerView: View {
     @State private var waveOffset = 0.0
     @State private var showCelebration = false
     @State private var isTimerPaused = false
+    @State private var showZeroTimeAlert = false
     
     // Constants for customization
     private let progressColor = Color(hex: "#007AFF") // Apple's default blue
@@ -292,6 +293,21 @@ struct FloatingTimerView: View {
         .onHover { hovering in
             isHovering = hovering
         }
+        .alert("Timer Completed", isPresented: $showZeroTimeAlert) {
+            Button("Complete Task") {
+                completeTask()
+            }
+            Button("Start Again") {
+                // Reset timer to initial duration and start
+                remainingSeconds = totalDuration
+                startTimeSeconds = remainingSeconds
+                taskManager.updateTaskRemainingDuration(TimeInterval(remainingSeconds))
+                taskManager.toggleWorkingState()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Would you like to complete this task or start the timer again?")
+        }
         .onAppear {
             // Initialize state first
             if let task = currentTask {
@@ -324,6 +340,12 @@ struct FloatingTimerView: View {
     }
     
     private func startTimer() {
+        // If time is zero, show confirmation dialog
+        if remainingSeconds == 0 {
+            showZeroTimeAlert = true
+            return
+        }
+        
         // Cleanup existing timer and observers
         timerState.cleanup()
         
