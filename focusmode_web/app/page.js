@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/homePage/Hero";
 import FeatureList from "@/components/features/FeatureList";
-
+import TestimonialSection from "@/components/testimonials/TestimonialSection";
 export const revalidate = false;
 
 export function generateStaticParams() {
@@ -14,6 +14,7 @@ export default function Page() {
       <Header />
       <Hero />
       <FeatureList />
+      <TestimonialSection />
     </>
   );
 }

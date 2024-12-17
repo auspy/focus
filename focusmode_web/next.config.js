@@ -2,6 +2,9 @@
 import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   transpilePackages: ["ui"],
+  images: {
+    domains: ["images.unsplash.com"],
+  },
   async headers() {
     return [
       // {
