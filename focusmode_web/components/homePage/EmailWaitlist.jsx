@@ -69,7 +69,7 @@ export default function EmailWaitlist() {
               setStatus("");
             }}
             placeholder="Enter your email"
-            className="flex-1"
+            className="flex-1 bg-white"
             disabled={loading}
             required
           />

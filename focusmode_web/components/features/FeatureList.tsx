@@ -84,7 +84,7 @@ export default function FeatureList() {
   ];
   return (
     <>
-      <div className="wrapper flex flex-col gap-y-32 pb-20">
+      <div id="features" className="wrapper flex flex-col gap-y-32 pb-20">
         {data.map((item, i) => (
           <FeatureListItem
             key={item.title + i}

@@ -12,6 +12,10 @@ const Navigation = [
   //   target: "_blank",
   // },
   {
+    label: "Features",
+    href: "#features",
+  },
+  {
     label: "Privacy Policy",
     href: "/privacy",
   },
@@ -19,7 +23,7 @@ const Navigation = [
 export default function Header() {
   return (
     <div className="w-screen border-b border-border flex  justify-center">
-      <div className="h-[60px] contain flex justify-between items-center  w-full">
+      <div className="h-[60px]  contain flex justify-between items-center  w-full">
         <div className="flex ">
           <Logo />
           <p className="ml-1 mb-1 text-[10px] opacity-60 font-medium self-end">
