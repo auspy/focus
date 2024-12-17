@@ -112,22 +112,22 @@ class TaskManager: ObservableObject {
             tasks.remove(at: index)
         }
         
-        // Stop working state
-        isWorking = false
-        
         // Queue the database operation
         pendingOperations.append(.complete(currentTask))
         
         // Move to next task if available
         if !tasks.isEmpty {
-            self.currentTask = tasks[0]
+            let nextTask = tasks[0]
+            self.currentTask = nextTask
+            // Start the next task automatically
+            startTask(nextTask)
             NotificationCenter.default.post(
                 name: .taskSwitched,
                 object: nil,
-                userInfo: ["newTask": tasks[0]]
+                userInfo: ["newTask": nextTask]
             )
         } else {
-            self.currentTask = nil
+            closeWorkingState()
             NotificationCenter.default.post(name: .allTasksCompleted, object: nil)
         }
         

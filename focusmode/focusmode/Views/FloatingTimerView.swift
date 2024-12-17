@@ -116,12 +116,41 @@ private struct ControlButtons: View {
     }
 }
 
+// Add TimerStateManager class before FloatingTimerView
+class TimerStateManager: ObservableObject {
+    var taskSwitchToken: NSObjectProtocol?
+    var tasksCompletedToken: NSObjectProtocol?
+    var timeAddedToken: NSObjectProtocol?
+    var timerInstance: Timer?
+    
+    func cleanup() {
+        timerInstance?.invalidate()
+        timerInstance = nil
+        
+        if let token = taskSwitchToken {
+            NotificationCenter.default.removeObserver(token)
+        }
+        if let token = tasksCompletedToken {
+            NotificationCenter.default.removeObserver(token)
+        }
+        if let token = timeAddedToken {
+            NotificationCenter.default.removeObserver(token)
+        }
+    }
+    
+    deinit {
+        cleanup()
+    }
+}
+
 struct FloatingTimerView: View {
     @ObservedObject var taskManager: TaskManager
     @Binding var progressStyle: ProgressStyle
+    @StateObject private var timerState = TimerStateManager()
     @State private var isHovering = false
     @State private var remainingSeconds: Int
     @State private var startTimeSeconds: Int
+    @State private var totalDuration: Int
     @State private var waveOffset = 0.0
     @State private var showCelebration = false
     @State private var isTimerPaused = false
@@ -156,6 +185,7 @@ struct FloatingTimerView: View {
         print("[Init] Initial seconds set to:", seconds)
         _remainingSeconds = State(initialValue: seconds)
         _startTimeSeconds = State(initialValue: seconds)
+        _totalDuration = State(initialValue: Int(task.duration))
         self.initialSeconds = Int(task.duration)
     }
     
@@ -171,9 +201,10 @@ struct FloatingTimerView: View {
     }
     
     private var progress: CGFloat {
-        // Calculate progress from 0.0 to 1.0
-        let elapsed = startTimeSeconds - remainingSeconds
-        return CGFloat(elapsed) / CGFloat(startTimeSeconds)
+        guard let task = currentTask else { return 0 }
+        let totalDuration = TimeInterval(totalDuration)
+        let remainingDuration = TimeInterval(remainingSeconds)
+        return 1 - (CGFloat(remainingDuration) / CGFloat(totalDuration))
     }
     
     @ViewBuilder
@@ -266,17 +297,22 @@ struct FloatingTimerView: View {
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
                 startTimeSeconds = remainingSeconds
+                totalDuration = Int(task.duration)
                 isTimerPaused = false
             }
             
             // Start timer after initialization
             startTimer()
         }
+        .onDisappear {
+            timerState.cleanup()
+        }
         .onChange(of: currentTask?.id) { oldValue, newValue in
             // Update when current task changes
             if let task = currentTask {
                 remainingSeconds = Int(task.remainingDuration ?? task.duration)
                 startTimeSeconds = remainingSeconds
+                totalDuration = Int(task.duration)
             }
         }
         .onChange(of: taskManager.tasks) { oldTasks, newTasks in
@@ -288,27 +324,30 @@ struct FloatingTimerView: View {
     }
     
     private func startTimer() {
-        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+        // Cleanup existing timer and observers
+        timerState.cleanup()
+        
+        // Create and retain new timer
+        timerState.timerInstance = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             // Only update if task is in working state
-            guard taskManager.isWorking else {
+            guard self.taskManager.isWorking else {
                 print("[Timer] Skipped update - task not working")
                 return
             }
             
-            print("[Timer] Before update - remainingSeconds:", remainingSeconds)
-            if remainingSeconds > 0 {
-                remainingSeconds -= 1
-                print("[Timer] After decrement - remainingSeconds:", remainingSeconds)
-                taskManager.updateTaskRemainingDuration(TimeInterval(remainingSeconds))
+            print("[Timer] Before update - remainingSeconds:", self.remainingSeconds)
+            if self.remainingSeconds > 0 {
+                self.remainingSeconds -= 1
+                print("[Timer] After decrement - remainingSeconds:", self.remainingSeconds)
+                self.taskManager.updateTaskRemainingDuration(TimeInterval(self.remainingSeconds))
             } else {
                 print("[Timer] Timer reached zero - stopping timer")
-                // timer.invalidate()
-                taskManager.toggleWorkingState() // Stop the timer but don't complete the task
+                self.taskManager.toggleWorkingState() // Stop the timer but don't complete the task
             }
         }
         
         // Listen for task switches
-        NotificationCenter.default.addObserver(
+        timerState.taskSwitchToken = NotificationCenter.default.addObserver(
             forName: .taskSwitched,
             object: nil,
             queue: .main
@@ -324,10 +363,11 @@ struct FloatingTimerView: View {
             remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
             print("[TaskSwitch] Updated remainingSeconds to:", remainingSeconds)
             startTimeSeconds = remainingSeconds
+            totalDuration = Int(newTask.duration)
         }
         
         // Listen for all tasks completed
-        NotificationCenter.default.addObserver(
+        timerState.tasksCompletedToken = NotificationCenter.default.addObserver(
             forName: .allTasksCompleted,
             object: nil,
             queue: .main
@@ -338,7 +378,7 @@ struct FloatingTimerView: View {
         }
         
         // Listen for time additions
-        NotificationCenter.default.addObserver(
+        timerState.timeAddedToken = NotificationCenter.default.addObserver(
             forName: .taskTimeAdded,
             object: nil,
             queue: .main
@@ -348,7 +388,7 @@ struct FloatingTimerView: View {
                   !showCelebration else { return }
             
             remainingSeconds += Int(addedSeconds)
-            startTimeSeconds = remainingSeconds
+            totalDuration += Int(addedSeconds)
         }
     }
     
