@@ -28,8 +28,11 @@ export function SiteFooter() {
               </Link>
             </li> */}
             <li>
-              <Link href="/terms" className="text-gray-600 hover:text-gray-900">
-                Terms
+              <Link
+                href="/privacy"
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Privacy Policy
               </Link>
             </li>
           </ul>

@@ -1,7 +1,4 @@
 import Logo from "@/components/Logo";
-import { SignedOut } from "@clerk/nextjs";
-import { SignedIn } from "@clerk/nextjs";
-import { SignInButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 const Navigation = [
