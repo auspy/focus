@@ -16,7 +16,7 @@ export default function Page() {
       <Header />
       <Hero />
       <FeatureList />
-      <TestimonialSection />
+      {/* <TestimonialSection /> */}
       <CTASection />
       <SiteFooter />
     </>
