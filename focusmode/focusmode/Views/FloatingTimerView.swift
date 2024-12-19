@@ -57,11 +57,8 @@ private struct ControlButtons: View {
             return false // Never disable for stopwatch mode
         }
         
-        // For timer mode, check remaining duration
-        return taskManager.tasks.isEmpty || 
-               currentTask.title == "No Task" || 
-               currentTask.remainingDuration == nil || 
-               (currentTask.remainingDuration ?? 0) <= 0
+        // Only disable if there's no task or it's a "No Task"
+        return taskManager.tasks.isEmpty || currentTask.title == "No Task"
     }
     
     private var isStopwatchMode: Bool {
@@ -174,7 +171,6 @@ struct FloatingTimerView: View {
     @State private var showCelebration = false
     @State private var isTimerPaused = false
     @State private var showZeroTimeAlert = false
-    @State private var overtimeSeconds: Int = 0
     @State private var stopwatchSeconds: Int = 0
     
     // Constants for customization
@@ -233,10 +229,14 @@ struct FloatingTimerView: View {
             let seconds = remainingSeconds % 60
             return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
         } else {
-            let totalOvertime = overtimeSeconds
-            let hours = totalOvertime / 3600
-            let minutes = (totalOvertime % 3600) / 60
-            let seconds = totalOvertime % 60
+            // Get overtime directly from task's remaining duration
+            let taskOvertime = currentTask.map { task in
+                Int(-(task.remainingDuration ?? 0))
+            } ?? 0
+            
+            let hours = taskOvertime / 3600
+            let minutes = (taskOvertime % 3600) / 60
+            let seconds = taskOvertime % 60
             return String(format: "+%02d:%02d:%02d", hours, minutes, seconds)
         }
     }
@@ -250,7 +250,11 @@ struct FloatingTimerView: View {
                 stopwatchSeconds = Int(currentTask?.elapsedTime ?? 0)
             }
         } else {
-            overtimeSeconds = 0
+            // Initialize remaining time from task
+            if let task = currentTask {
+                let remaining = task.remainingDuration ?? task.duration
+                remainingSeconds = remaining > 0 ? Int(remaining) : 0
+            }
         }
         
         // Cleanup existing timer and observers
@@ -274,8 +278,17 @@ struct FloatingTimerView: View {
                     print("[Timer] After decrement - remainingSeconds:", self.remainingSeconds)
                     self.taskManager.updateTaskRemainingDuration(TimeInterval(self.remainingSeconds))
                 } else {
-                    self.overtimeSeconds += 1
-                    print("[Timer] Overtime - seconds:", self.overtimeSeconds)
+                    // Get current overtime from task's remaining duration
+                    let currentOvertime = self.currentTask.map { task in
+                        Int(-(task.remainingDuration ?? 0))
+                    } ?? 0
+                    
+                    // Increment overtime
+                    let newOvertime = currentOvertime + 1
+                    print("[Timer] Overtime - seconds:", newOvertime)
+                    
+                    // Store the new overtime directly in task's remaining duration
+                    self.taskManager.updateTaskRemainingDuration(TimeInterval(-newOvertime))
                 }
             }
         }
@@ -293,11 +306,15 @@ struct FloatingTimerView: View {
                 return
             }
             
-            print("[TaskSwitch] Updating remainingSeconds from:", remainingSeconds)
-            remainingSeconds = Int(newTask.remainingDuration ?? newTask.duration)
-            print("[TaskSwitch] Updated remainingSeconds to:", remainingSeconds)
-            startTimeSeconds = remainingSeconds
+            print("[TaskSwitch] Switching to new task")
+            let newRemaining = newTask.remainingDuration ?? newTask.duration
+            
+            // Reset state for the new task
+            startTimeSeconds = Int(newTask.duration)  // Use original duration for start time
             totalDuration = Int(newTask.duration)
+            remainingSeconds = newRemaining > 0 ? Int(newRemaining) : 0
+            
+            print("[TaskSwitch] New task state - remaining:", remainingSeconds)
         }
         
         // Listen for all tasks completed
