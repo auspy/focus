@@ -87,7 +87,7 @@
   }
 
   body {
-    font-family: "Inter", sans-serif;
+    /* font-family: "Inter", sans-serif; */
     @apply text-zinc-800;
     overflow-x: hidden;
     width: 100vw;
@@ -102,12 +102,12 @@
   }
 
   h1 {
-    @apply font-bold unselectable;
+    @apply font-bold;
     font-size: clamp(42px, 10vw, 48px);
 
     text-align: center;
     /* h1 */
-    font-family: Inter;
+    /* font-family: "Inter"; */
     font-style: normal;
     font-weight: 800;
     line-height: 120%;
